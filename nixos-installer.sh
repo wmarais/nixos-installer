@@ -67,7 +67,7 @@ vgcreate ${LVM_VG_POOL_NAME} /dev/mapper/${LUKS_VOL_NAME}
 
 # Create the swap partition.
 lvcreate -L ${SWAP_SIZE} -n ${LVM_SWAP_LV_NAME} ${LVM_VG_POOL_NAME}
-mkswap /dev/${LVM_VG_POOL_NAME}/${LVM_SWAP_LV_NAME}
+mkswap -L swap /dev/${LVM_VG_POOL_NAME}/${LVM_SWAP_LV_NAME}
 
 lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
 mkfs.ext4 -L nixos /dev/${LVM_VG_POOL_NAME}/${LVM_ROOT_LV_NAME}
