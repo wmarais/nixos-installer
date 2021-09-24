@@ -111,12 +111,12 @@ setup_encryption() {
 	check_error "Failed to open encrypted partition."
 }
 
+#		$1 = Partition Name
+#		$2 = Volume Group Name
 setup_lvm() {
 	# Create the volume group.
 	pvcreate /dev/mapper/$1
 	vgcreate $2 /dev/mapper/$1
-
-	
 
 	lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
 	mkfs.ext4 -L nixos /dev/${LVM_VG_POOL_NAME}/${LVM_ROOT_LV_NAME}
@@ -161,7 +161,7 @@ create_partition ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME} ${LUKS_PART_TYPE} \
 setup_encryption ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME}
 
 # Setup LVM and the logical volume for Swap and /root.
-setup_lvm ${LVM_PV_NAME} ${LVM_VG_NAME}
+setup_lvm ${LUKS_PART_NAME} ${LVM_VG_NAME}
 create_lv ${LVM_VG_NAME} ${LVM_SWAP_LV_NAME} ${SWAP_SIZE} ${SWAP_FS}
 create_lv ${LVM_VG_NAME} ${LVM_ROOT_LV_NAME} ${ROOT_SIZE} ${ROOT_FS}
 
