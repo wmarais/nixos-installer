@@ -61,7 +61,7 @@ create_partition_table() {
 #  	$3 = Partition Name
 ################################################################################
 set_partition_name() {
-	parted -s $1$2 name $3
+	parted -s $1 name $2 $3
 	check_error "Failed to set name of $1$2 to $3"
 }
 
