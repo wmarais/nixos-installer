@@ -138,7 +138,7 @@ create_lv() {
 		lvcreate -L $3 -n $2 $1
 	fi
 	
-	check_error("Failed to create logical volume: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4")
+	check_error "Failed to create logical volume: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
 	
 	if [ ${4} == "swap" ]; then
 		mkswap -L swap /dev/$1/$2
@@ -146,7 +146,7 @@ create_lv() {
 		mkfs.${4} -L $2 /dev/$1/$2
 	fi
 	
-	check_error("Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4")
+	check_error "Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
 }
 
 ################################################################################
