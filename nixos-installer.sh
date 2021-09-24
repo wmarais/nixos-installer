@@ -84,12 +84,13 @@ create_partition() {
 	
 	set_partition_name $1 $2 $3
 	
-	if [ $4 -eq EPS ]; then
+	if [ "$4" == "EPS" ]; then
 		parted -s $1 set $2 esp on
 		check_error "Failed to set the esp flag on the EFI partition."
 	fi
 }
 
+# Create a new GPT partition.
 create_partition_table ${HDD}
 
 # Create and configure the EFI partition.
