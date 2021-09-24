@@ -18,7 +18,7 @@ BOOT_PART_START=513MiB
 BOOT_PART_END=1024MiB
 
 LUKS_PART_NUM=3
-LUKS_PART_NAME=part-luks
+LUKS_PART_NAME=luks
 LUKS_PART_TYPE=primary
 LUKS_PART_FS=ext4
 LUKS_PART_START=1025MiB
@@ -33,6 +33,7 @@ ROOT_SIZE=100%FREE
 LVM_VG_POOL_NAME=sysvg
 LVM_SWAP_LV_NAME=swaplv
 LVM_ROOT_LV_NAME=rootlv
+
 
 
 check_error() {
@@ -90,6 +91,26 @@ create_partition() {
 	fi
 }
 
+################################################################################
+#
+#		$1 = Hard Drive Path
+#		$2 = Partition Number
+#   $3 = 
+################################################################################
+setup_encryption() {
+	# Check if a luks keyfile exist.
+	if [ ! -f "${LUKS_KEY}" ]; then
+		echo "password" > "${LUKS_KEY}"
+	fi
+	
+	cryptsetup -q luksFormat $1$2 ${LUKS_KEY}
+	check_error "Failed to format encrypted partition."
+
+	cryptsetup -q luksOpen $1$2 $3 --key-file ${LUKS_KEY}
+	check_error "Failed to open encrypted partition."
+}
+
+################################################################################
 # Create a new GPT partition.
 create_partition_table ${HDD}
 
@@ -105,14 +126,14 @@ create_partition ${HDD} ${BOOT_PART_NUM} ${BOOT_PART_NAME} ${BOOT_PART_TYPE} \
 create_partition ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME} ${LUKS_PART_TYPE} \
 	${LUKS_PART_FS} ${LUKS_PART_START} ${LUKS_PART_END}
 
+# Setup the encrypted partition.
+setup_encryption ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME}
+
+
 
 
 ## Mount the encrypted partition.
-#cryptsetup -q luksFormat /dev/sda3 ${LUKS_KEY}
-#check_error "Failed to format encrypted partition."
 
-#cryptsetup -q luksOpen /dev/sda3 ${LUKS_VOL_NAME} --key-file ${LUKS_KEY}
-#check_error "Failed to open encrypted partition."
 
 ## Create the LVM physical volume and volume group.
 #pvcreate /dev/mapper/${LUKS_VOL_NAME} 
