@@ -49,7 +49,7 @@ check_error() {
 ################################################################################
 create_partition_table() {
 	# Create the partition table on the HDD.
-	parted -s -a optimal $1 mklabel gpt
+	parted -s $1 mklabel gpt
 	check_error "Failed to create partition table on $1."
 }
 
@@ -106,9 +106,6 @@ create_partition ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME} ${LUKS_PART_TYPE} \
 	${LUKS_PART_FS} ${LUKS_PART_START} ${LUKS_PART_END}
 
 
-# Create the encrypted partition.
-parted -s -a optimal ${HDD} mkpart primary ${LUKS_PART_START} ${LUKS_PART_END}
-check_error "Failed to create encrypted partition."
 
 ## Mount the encrypted partition.
 #cryptsetup -q luksFormat /dev/sda3 ${LUKS_KEY}
