@@ -132,7 +132,11 @@ setup_lvm() {
 # 	$3 = Logical Volume Size
 #		$4 = Logical Volume File System
 create_lv() {
-	lvcreate -L $3 -n $2 $1
+	if [[ $3 == *"%"* ]]; then
+		lvcreate -l $3 -n $2 $1
+	else
+		lvcreate -L $3 -n $2 $1
+	fi
 	
 	if [ ${4} == "swap" ]; then
 		mkswap -L swap /dev/$1/$2
