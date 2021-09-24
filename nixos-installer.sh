@@ -117,9 +117,6 @@ setup_lvm() {
 	# Create the volume group.
 	pvcreate /dev/mapper/$1
 	vgcreate $2 /dev/mapper/$1
-
-	lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
-	mkfs.ext4 -L nixos /dev/${LVM_VG_POOL_NAME}/${LVM_ROOT_LV_NAME}
 }
 
 # 	$1 = VG Name
@@ -132,7 +129,7 @@ setup_lvm() {
 # 	$3 = Logical Volume Size
 #		$4 = Logical Volume File System
 create_lv() {
-	if [[ $3 == *"%"* ]]; then
+	if [[ "$3" == *"%"* ]]; then
 		lvcreate -l $3 -n $2 $1
 	else
 		lvcreate -L $3 -n $2 $1
@@ -141,9 +138,9 @@ create_lv() {
 	check_error "Failed to create logical volume: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
 	
 	if [ ${4} == "swap" ]; then
-		mkswap -L swap /dev/$1/$2
+		mkswap -L $2 /dev/$1/$2
 	else
-		mkfs.${4} -L $2 /dev/$1/$2
+		mke2fs -t ${4} -L $2 /dev/$1/$2
 	fi
 	
 	check_error "Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
