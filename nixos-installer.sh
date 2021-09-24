@@ -23,17 +23,18 @@ LUKS_PART_TYPE=primary
 LUKS_PART_FS=ext4
 LUKS_PART_START=1025MiB
 LUKS_PART_END=100%
-
 LUKS_KEY="luks_key.txt"
 
-SWAP_SIZE=2G
-ROOT_SIZE=100%FREE
+LVM_PV_NAME=syspv
+LVM_VG_NAME=sysvg
 
-
-LVM_VG_POOL_NAME=sysvg
 LVM_SWAP_LV_NAME=swaplv
-LVM_ROOT_LV_NAME=rootlv
+SWAP_FS=swap
+SWAP_SIZE=2G
 
+LVM_ROOT_LV_NAME=rootlv
+ROOT_FS=ext4
+ROOT_SIZE=100%FREE
 
 
 check_error() {
@@ -110,6 +111,36 @@ setup_encryption() {
 	check_error "Failed to open encrypted partition."
 }
 
+setup_lvm() {
+	# Create the volume group.
+	pvcreate /dev/mapper/$1
+	vgcreate $2 /dev/mapper/$1
+
+	
+
+	lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
+	mkfs.ext4 -L nixos /dev/${LVM_VG_POOL_NAME}/${LVM_ROOT_LV_NAME}
+}
+
+# 	$1 = VG Name
+#		$2 = LV Name
+#		$3 = Size
+
+################################################################################
+#		$1 = Volume Group Name
+#		$2 = Logical Volume Name
+# 	$3 = Logical Volume Size
+#		$4 = Logical Volume File System
+create_lv() {
+	lvcreate -L $3 -n $2 $1
+	
+	if [ ${4} == "swap" ]; then
+		mkswap -L swap /dev/$1/$2
+	else
+		mkfs.${4} -L $2 /dev/$1/$2
+	fi
+}
+
 ################################################################################
 # Create a new GPT partition.
 create_partition_table ${HDD}
@@ -129,21 +160,13 @@ create_partition ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME} ${LUKS_PART_TYPE} \
 # Setup the encrypted partition.
 setup_encryption ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME}
 
+# Setup LVM and the logical volume for Swap and /root.
+setup_lvm ${LVM_PV_NAME} ${LVM_VG_NAME}
+create_lv ${LVM_VG_NAME} ${LVM_SWAP_LV_NAME} ${SWAP_SIZE} ${SWAP_FS}
+create_lv ${LVM_VG_NAME} ${LVM_ROOT_LV_NAME} ${ROOT_SIZE} ${ROOT_FS}
+
+# Mount the partions for installation.
 
 
-
-## Mount the encrypted partition.
-
-
-## Create the LVM physical volume and volume group.
-#pvcreate /dev/mapper/${LUKS_VOL_NAME} 
-#vgcreate ${LVM_VG_POOL_NAME} /dev/mapper/${LUKS_VOL_NAME}
-
-## Create the swap partition.
-#lvcreate -L ${SWAP_SIZE} -n ${LVM_SWAP_LV_NAME} ${LVM_VG_POOL_NAME}
-#mkswap -L swap /dev/${LVM_VG_POOL_NAME}/${LVM_SWAP_LV_NAME}
-
-#lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
-#mkfs.ext4 -L nixos /dev/${LVM_VG_POOL_NAME}/${LVM_ROOT_LV_NAME}
 
 
