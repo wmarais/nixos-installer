@@ -13,14 +13,14 @@ BOOT_PART_START=513MiB
 BOOT_PART_END=1024MiB
 
 LUKS_PART_START=1025MiB
-LUKS_PART_END=100%FREE
+LUKS_PART_END=100%
 LUKS_PART_NAME=part-luks
 LUKS_VOL_NAME=crypt3
 
 LUKS_KEY="luks_key.txt"
 
 SWAP_SIZE=2G
-ROOT_SIZE=100%
+ROOT_SIZE=100%FREE
 
 
 LVM_VG_POOL_NAME=sysvg
@@ -70,6 +70,6 @@ lvcreate -L ${SWAP_SIZE} -n ${LVM_SWAP_LV_NAME} ${LVM_VG_POOL_NAME}
 mkswap /dev/${LVM_VG_POOL_NAME}/${LVM_SWAP_LV_NAME}
 
 lvcreate -l ${ROOT_SIZE} -n ${LVM_ROOT_LV_NAME} ${LVM_VG_POOL_NAME}
-mkfs.ext4 -L nixos /dev/sda3
+#mkfs.ext4 -L nixos /dev/sda3
 
 
