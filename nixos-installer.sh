@@ -98,10 +98,10 @@ setup_encryption() {
 		echo "password" > "${LUKS_KEY}"
 	fi
 	
-	cryptsetup -q luksFormat $1$2 ${LUKS_KEY}
+	cryptsetup --type luks1 -q luksFormat $1$2 ${LUKS_KEY}
 	check_error "Failed to format encrypted partition."
 
-	cryptsetup -q luksOpen $1$2 $3 --key-file ${LUKS_KEY}
+	cryptsetup --type luks1 -q luksOpen $1$2 $3 --key-file ${LUKS_KEY}
 	check_error "Failed to open encrypted partition."
 }
 
