@@ -17,12 +17,12 @@
   };
   
   fileSystems."/boot" = {
-    device = "/dev/disk/by-label/boot";
+    device = "/dev/sda2";
     fsType = "ext4";
   };
 
   fileSystems."/boot/efi" = {
-    device = "/dev/disk/by-label/EFI";
+    device = "/dev/sda1";
     fsType = "vfat";
   };
 
