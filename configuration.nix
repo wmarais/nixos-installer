@@ -2,6 +2,8 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
+# https://nixos.org/manual/nixos/stable/options.html
+
 { config, pkgs, ... }:
 
 {
@@ -10,15 +12,21 @@
       ./hardware-configuration.nix
     ];
     
-	boot.loader.efi.canTouchEfiVariables = true;
-	boot.loader.grub = {
-		enable = true;
-		version = 2;
-		device = "nodev";
-		efiSupport = true;
-		enableCryptodisk = true;
-	};
-	boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  # Enable EFI Boot.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi = {
+    canTouchEfiVariables = true;
+    efiSysMountPoint = "/boot/efi";
+  }
+  
+  boot.loader.grub = {
+    enable = true;
+    version = 2;
+    device = "/dev/sda"
+    efiSupport = true;
+    enableCryptodisk = true;
+  };
+	
 	boot.initrd.luks.devices = {
 		  root = {
 		    device = "/dev/sda2";
