@@ -161,7 +161,7 @@ create_lv ${LVM_VG_NAME} ${LVM_SWAP_LV_NAME} ${SWAP_SIZE} ${SWAP_FS}
 create_lv ${LVM_VG_NAME} ${LVM_ROOT_LV_NAME} ${ROOT_SIZE} ${ROOT_FS}
 
 # Wait for the LVMs to become available.
-while [ ! -f /dev/disk/by-label/${LVM_ROOT_LV_NAME} ]; do
+while [ ! -e /dev/disk/by-label/${LVM_ROOT_LV_NAME} ]; do
 	echo "Waiting for /dev/disk/by-label/${LVM_ROOT_LV_NAME} to become available....."
 	sleep 1s
 done
