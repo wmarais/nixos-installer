@@ -15,6 +15,11 @@
     device = "/dev/disk/by-label/rootlv";
     fsType = "ext4";
   };
+  
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-label/boot";
+    fsType = "ext4";
+  };
 
   fileSystems."/boot/efi" = {
     device = "/dev/disk/by-label/EFI";
