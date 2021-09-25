@@ -80,6 +80,7 @@ create_partition() {
 	set_partition_name $1 $2 $3
 	
 	if [ "$4" == "EPS" ]; then
+		mkfs.fat32 -L $3 $1$2
 		parted -s $1 set $2 esp on
 		check_error "Failed to set the esp flag on the EFI partition."
 	fi
