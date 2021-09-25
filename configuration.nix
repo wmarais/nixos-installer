@@ -24,7 +24,7 @@
     version = 2;
     device = "nodev";
     efiSupport = true;
-    enableCryptodisk = true;
+    #enableCryptodisk = true;
   };
 	
 	boot.initrd.luks.devices = {
