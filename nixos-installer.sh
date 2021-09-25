@@ -6,7 +6,7 @@ HDD=/dev/sda
 EFI_PART_NUM=1
 EFI_PART_NAME=EFI
 EFI_PART_TYPE=EPS
-EFI_PART_FS=fat32
+EFI_PART_FS=vfat
 EFI_PART_START=1MiB
 EFI_PART_END=512MiB
 
@@ -85,8 +85,11 @@ create_partition() {
 	
 	set_partition_name $1 $2 $3
 	
+	# Create the file system for the partition.
+	mke2fs -t ${5} -L $3 $1$2
+	check_error "Failed to create filesystem of type: $5, and name:$3, on $1$2."
+	
 	if [ "$4" == "EPS" ]; then
-		mkfs.vfat -n $3 $1$2
 		parted -s $1 set $2 esp on
 		check_error "Failed to set the esp flag on the EFI partition."
 	fi
@@ -173,10 +176,15 @@ done
 
 # Mount the partions for installation.
 mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
+check_error "Failed to mount: /dev/disk/by-label/${LVM_ROOT_LV_NAME} to /mnt."
+
 mkdir -p /mnt/boot
 mount /dev/sda2 /mnt/boot
+check_error "Failed to mount: /dev/sda2 to /mnt/boot."
+
 mkdir -p /mnt/boot/efi
 mount /dev/disk/by-partlabel/${EFI_PART_NAME} /mnt/boot/efi
+check_error "Failed to mount: /dev/disk/by-partlabel/${EFI_PART_NAME} to /mnt/boot/efi."
 
 # Create the configurations files.
 mkdir -p /mnt/etc/nixos
