@@ -174,7 +174,7 @@ done
 # Mount the partions for installation.
 mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
 mkdir -p /mnt/boot
-mount /dev/sda2
+mount /dev/sda2 /mnt/boot
 mkdir -p /mnt/boot/efi
 mount /dev/disk/by-partlabel/${EFI_PART_NAME} /mnt/boot/efi
 
