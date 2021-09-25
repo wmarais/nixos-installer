@@ -29,7 +29,7 @@
 	
 	boot.initrd.luks.devices = {
 		  root = {
-		    device = "/dev/sda2";
+		    device = "/dev/sda3";
 		    preLVM = true;
 		  };
 	};

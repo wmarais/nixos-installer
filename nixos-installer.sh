@@ -10,13 +10,19 @@ EFI_PART_FS=fat32
 EFI_PART_START=1MiB
 EFI_PART_END=512MiB
 
-LUKS_PART_NUM=2
+BOOT_PART_NUM=2
+BOOT_PART_NAME=boot
+BOOT_PART_TYPE=primary
+BOOT_PART_FS=ext4
+BOOT_PART_START=513MiB
+BOOT_PART_END=1024MiB
+
+LUKS_PART_NUM=3
 LUKS_PART_NAME=luks
 LUKS_PART_TYPE=primary
 LUKS_PART_FS=ext4
-LUKS_PART_START=512MiB
+LUKS_PART_START=1025MiB
 LUKS_PART_END=100%
-LUKS_KEY="luks_key.txt"
 
 LVM_PV_NAME=syspv
 LVM_VG_NAME=sysvg
@@ -93,11 +99,6 @@ create_partition() {
 #   $3 = 
 ################################################################################
 setup_encryption() {
-	# Check if a luks keyfile exist.
-	if [ ! -f "${LUKS_KEY}" ]; then
-		echo "password" > "${LUKS_KEY}"
-	fi
-	
 	cryptsetup --type luks1 -q luksFormat $1$2 ${LUKS_KEY}
 	check_error "Failed to format encrypted partition."
 
@@ -147,6 +148,10 @@ create_partition_table ${HDD}
 # Create and configure the EFI partition.
 create_partition ${HDD} ${EFI_PART_NUM} ${EFI_PART_NAME} ${EFI_PART_TYPE} \
 	${EFI_PART_FS} ${EFI_PART_START} ${EFI_PART_END}
+	
+# Create and configure the EFI partition.
+create_partition ${HDD} ${BOOT_PART_NUM} ${BOOT_PART_NAME} ${BOOT_PART_TYPE} \
+	${BOOT_PART_FS} ${BOOT_PART_START} ${BOOT_PART_END}
 
 # Create the LUKS partition.
 create_partition ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME} ${LUKS_PART_TYPE} \
@@ -168,6 +173,8 @@ done
 
 # Mount the partions for installation.
 mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
+mkdir -p /mnt/boot
+mount /dev/sda2
 mkdir -p /mnt/boot/efi
 mount /dev/disk/by-partlabel/${EFI_PART_NAME} /mnt/boot/efi
 
