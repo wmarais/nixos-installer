@@ -99,10 +99,10 @@ create_partition() {
 #   $3 = 
 ################################################################################
 setup_encryption() {
-	cryptsetup --type luks1 -q luksFormat $1$2 ${LUKS_KEY}
+	cryptsetup --type luks1 -q luksFormat $1$2
 	check_error "Failed to format encrypted partition."
 
-	cryptsetup --type luks1 -q luksOpen $1$2 $3 --key-file ${LUKS_KEY}
+	cryptsetup --type luks1 -q luksOpen $1$2 $3
 	check_error "Failed to open encrypted partition."
 }
 
