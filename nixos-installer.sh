@@ -171,5 +171,11 @@ mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
 mkdir -p /mnt/boot/efi
 mount /dev/disk/by-partlabel/${EFI_PART_NAME} /mnt/boot/efi
 
+# Create the configurations files.
+mkdir -p /mnt/etc/nixos
+cp configuration.nix /mnt/etc/nixos/
+cp hardware-configuration.nix /mnt/etc/nixos/
 
+# Run the nixos installer.
+nixos-install
 
