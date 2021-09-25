@@ -4,7 +4,7 @@ HDD=/dev/sda
 
 
 EFI_PART_NUM=1
-EFI_PART_NAME=efi
+EFI_PART_NAME=EFI
 EFI_PART_TYPE=EPS
 EFI_PART_FS=fat32
 EFI_PART_START=1MiB
@@ -80,7 +80,7 @@ create_partition() {
 	set_partition_name $1 $2 $3
 	
 	if [ "$4" == "EPS" ]; then
-		mkfs.fat32 -L $3 $1$2
+		mkfs.vfat -n $3 $1$2
 		parted -s $1 set $2 esp on
 		check_error "Failed to set the esp flag on the EFI partition."
 	fi
@@ -159,6 +159,12 @@ setup_encryption ${HDD} ${LUKS_PART_NUM} ${LUKS_PART_NAME}
 setup_lvm ${LUKS_PART_NAME} ${LVM_VG_NAME}
 create_lv ${LVM_VG_NAME} ${LVM_SWAP_LV_NAME} ${SWAP_SIZE} ${SWAP_FS}
 create_lv ${LVM_VG_NAME} ${LVM_ROOT_LV_NAME} ${ROOT_SIZE} ${ROOT_FS}
+
+# Wait for the LVMs to become available.
+while [ ! -f /dev/disk/by-label/${LVM_ROOT_LV_NAME} ]; do
+	echo "Waiting for /dev/disk/by-label/${LVM_ROOT_LV_NAME} to become available....."
+	sleep 1s
+done
 
 # Mount the partions for installation.
 mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
