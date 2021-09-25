@@ -16,13 +16,13 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi = {
     canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot/efi";
-  }
+    efiSysMountPoint = "/boot";
+  };
   
   boot.loader.grub = {
     enable = true;
     version = 2;
-    device = "/dev/sda"
+    device = "nodev";
     efiSupport = true;
     enableCryptodisk = true;
   };
