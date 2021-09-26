@@ -80,21 +80,23 @@ set_partition_name() {
 ################################################################################
 create_partition() {
 	# Create the partition.
-	parted -s -a optimal $1 mkpart $4 $5 $6 $7
+	parted -s -a optimal $1 mkpart $4 $6 $7
 	check_error "Line($LINENO): Failed to create partition: Path=$1/$2, Name=$3, Type=$4, FS=$5, Start=$6, End=$7"
 	
 	set_partition_name $1 $2 $3
 	
-	if [ "$4" == "EPS" ]; then
-		mke2fs -t vfat -L $3 $1$2
-		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
-		parted -s $1 set $2 esp on
-		check_error "Line($LINENO): Failed to set the esp flag on the EFI partition."
-	else
-		# Create the file system for the partition.
-		mke2fs -t ${5} -L $3 $1$2
-		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
-	fi
+	# Create the file system for the partition.
+	mke2fs -t ${5} -L $3 $1$2
+	check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
+	
+#	if [ "$4" == "EPS" ]; then
+#		mke2fs -t vfat -L $3 $1$2
+#		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
+#		parted -s $1 set $2 esp on
+#		check_error "Line($LINENO): Failed to set the esp flag on the EFI partition."
+#	else
+#
+#	fi
 }
 
 ################################################################################
