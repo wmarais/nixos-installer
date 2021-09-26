@@ -51,7 +51,7 @@ check_error() {
 create_partition_table() {
 	# Create the partition table on the HDD.
 	parted -s $1 mklabel gpt
-	check_error "Failed to create partition table on $1."
+	check_error "Line($LINENO): Failed to create partition table on $1."
 }
 
 ################################################################################
@@ -63,7 +63,7 @@ create_partition_table() {
 ################################################################################
 set_partition_name() {
 	parted -s $1 name $2 $3
-	check_error "Failed to set name of $1$2 to $3"
+	check_error "Line($LINENO): Failed to set name of $1$2 to $3"
 }
 
 ################################################################################
@@ -81,19 +81,19 @@ set_partition_name() {
 create_partition() {
 	# Create the partition.
 	parted -s -a optimal $1 mkpart $4 $5 $6 $7
-	check_error "Failed to create partition: Path=$1/$2, Name=$3, Type=$4, FS=$5, Start=$6, End=$7"
+	check_error "Line($LINENO): Failed to create partition: Path=$1/$2, Name=$3, Type=$4, FS=$5, Start=$6, End=$7"
 	
 	set_partition_name $1 $2 $3
 	
 	if [ "$4" == "EPS" ]; then
 		mke2fs -t vfat -L $3 $1$2
-		check_error "Failed to create filesystem of type: $5, and name:$3, on $1$2."
+		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
 		parted -s $1 set $2 esp on
-		check_error "Failed to set the esp flag on the EFI partition."
+		check_error "Line($LINENO): Failed to set the esp flag on the EFI partition."
 	else
 		# Create the file system for the partition.
 		mke2fs -t ${5} -L $3 $1$2
-		check_error "Failed to create filesystem of type: $5, and name:$3, on $1$2."
+		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
 	fi
 }
 
@@ -105,10 +105,10 @@ create_partition() {
 ################################################################################
 setup_encryption() {
 	cryptsetup --type luks1 -q luksFormat $1$2
-	check_error "Failed to format encrypted partition."
+	check_error "Line($LINENO): Failed to format encrypted partition."
 
 	cryptsetup --type luks1 -q luksOpen $1$2 $3
-	check_error "Failed to open encrypted partition."
+	check_error "Line($LINENO): Failed to open encrypted partition."
 }
 
 #		$1 = Partition Name
@@ -135,7 +135,7 @@ create_lv() {
 		lvcreate -L $3 -n $2 $1
 	fi
 	
-	check_error "Failed to create logical volume: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
+	check_error "Line($LINENO): Failed to create logical volume: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
 	
 	if [ ${4} == "swap" ]; then
 		mkswap -L $2 /dev/$1/$2
@@ -143,7 +143,7 @@ create_lv() {
 		mke2fs -t ${4} -L $2 /dev/$1/$2
 	fi
 	
-	check_error "Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
+	check_error "Line($LINENO): Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
 }
 
 ################################################################################
@@ -172,21 +172,21 @@ create_lv ${LVM_VG_NAME} ${LVM_ROOT_LV_NAME} ${ROOT_SIZE} ${ROOT_FS}
 
 # Wait for the LVMs to become available.
 while [ ! -e /dev/disk/by-label/${LVM_ROOT_LV_NAME} ]; do
-	echo "Waiting for /dev/disk/by-label/${LVM_ROOT_LV_NAME} to become available....."
+	echo "Line($LINENO): Waiting for /dev/disk/by-label/${LVM_ROOT_LV_NAME} to become available....."
 	sleep 1s
 done
 
 # Mount the partions for installation.
 mount /dev/disk/by-label/${LVM_ROOT_LV_NAME} /mnt
-check_error "Failed to mount: /dev/disk/by-label/${LVM_ROOT_LV_NAME} to /mnt."
+check_error "Line($LINENO): Failed to mount: /dev/disk/by-label/${LVM_ROOT_LV_NAME} to /mnt."
 
 mkdir -p /mnt/boot
 mount /dev/sda2 /mnt/boot
-check_error "Failed to mount: /dev/sda2 to /mnt/boot."
+check_error "Line($LINENO): Failed to mount: /dev/sda2 to /mnt/boot."
 
 mkdir -p /mnt/boot/efi
 mount /dev/disk/by-partlabel/${EFI_PART_NAME} /mnt/boot/efi
-check_error "Failed to mount: /dev/disk/by-partlabel/${EFI_PART_NAME} to /mnt/boot/efi."
+check_error "Line($LINENO): Failed to mount: /dev/disk/by-partlabel/${EFI_PART_NAME} to /mnt/boot/efi."
 
 # Create the configurations files.
 mkdir -p /mnt/etc/nixos
