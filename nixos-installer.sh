@@ -86,7 +86,7 @@ create_partition() {
 	set_partition_name $1 $2 $3
 	
 	# Create the file system for the partition.
-	mke2fs -t ${5} -L $3 $1$2
+	mkfs -t ${5} -L $3 $1$2
 	check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
 	
 #	if [ "$4" == "EPS" ]; then
@@ -142,7 +142,7 @@ create_lv() {
 	if [ ${4} == "swap" ]; then
 		mkswap -L $2 /dev/$1/$2
 	else
-		mke2fs -t ${4} -L $2 /dev/$1/$2
+		mkfs -t ${4} -L $2 /dev/$1/$2
 	fi
 	
 	check_error "Line($LINENO): Failed to LV file system: VG Name=$1, LV Name=$2, LV Size=$3, LV FS=$4"
