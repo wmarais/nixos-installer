@@ -85,18 +85,16 @@ create_partition() {
 	
 	set_partition_name $1 $2 $3
 	
-	# Create the file system for the partition.
-	mkfs -t ${5} -L $3 $1$2
-	check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
-	
-#	if [ "$4" == "EPS" ]; then
-#		mke2fs -t vfat -L $3 $1$2
-#		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
-#		parted -s $1 set $2 esp on
-#		check_error "Line($LINENO): Failed to set the esp flag on the EFI partition."
-#	else
-#
-#	fi
+	if [ "$4" == "EPS" ]; then
+		mkfs -t $5 -n $3 $1$2
+		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
+		parted -s $1 set $2 esp on
+		check_error "Line($LINENO): Failed to set the esp flag on the EFI partition."
+	else
+		# Create the file system for the partition.
+		mkfs -t ${5} -L $3 $1$2
+		check_error "Line($LINENO): Failed to create filesystem of type: $5, and name:$3, on $1$2."
+	fi
 }
 
 ################################################################################
