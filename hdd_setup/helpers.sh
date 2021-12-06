@@ -57,6 +57,11 @@ make_part()
   # The HDD that the partition will be created on.
   HDD=$1
 
+  # The name of the partition. This will make the disk appear in  
+  # /dev/disk/by-label/${NAME} which makes it easier to reference when the
+  # partition layout changes. (I.e. no dependency on exact partition numbers.)
+  NAME=$2
+
   # The filesystem that the partition will be formatted too. This only support
   # the three partition types that is used to implement the installation
   # startegy. These are:
@@ -66,12 +71,7 @@ make_part()
   #   boot  - Boot partition.
   # All other partitions such as the root and swap partitions are created as
   # LVM logical volumes and thus there are no supported "ext*" or "swap" type.
-  TYPE=$2
-  
-  # The name of the partition. This will make the disk appear in  
-  # /dev/disk/by-label/${NAME} which makes it easier to reference when the
-  # partition layout changes. (I.e. no dependency on exact partition numbers.)
-  NAME=$3
+  TYPE=$3
 
   # The boundary of the partition. Since things tend to work better when the
   # boundaries align to 2^N, use the MiB and GiB notations for explicit sizes.
