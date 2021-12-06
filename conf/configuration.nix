@@ -46,7 +46,7 @@
   # Enable SSH and disable root logins.
   services.openssh = {
     enable = true;
-    permitRootLogin = false;
+    permitRootLogin = "no";
   };
 
   # This value determines the NixOS release from which the default
