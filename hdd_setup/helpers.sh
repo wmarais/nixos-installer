@@ -127,6 +127,14 @@ make_part()
   esac
 }
 
+make_pv()
+{
+  HDD=$1
+  pvcreate ${HDD}
+
+
+}
+
 ################################################################################
 # Create a Volume Group from the array of Physical Volumes.
 ################################################################################
@@ -134,11 +142,11 @@ make_vg()
 {
   VG_NAME=$1
   shift
-  PHYSICAL_VOLUMES=("$@")
+  PV=("$@")
 
-  print_info ${LINENO} "Creating volume group \"${VG_NAME}\" on ${PHYSICAL_VOLUMES[@]}"
+  print_info ${LINENO} "Creating volume group \"${VG_NAME}\" on ${PV[@]}"
 
-  vgcreate ${VG_NAME} ${PHYSICAL_VOLUMES[@]}
+  vgcreate ${VG_NAME} ${PV[@]}
   check_error ${LINENO} "Failed to create volume group: ${VG_NAME}."
 }
 
