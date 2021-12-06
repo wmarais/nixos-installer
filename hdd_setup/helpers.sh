@@ -45,6 +45,7 @@ wait_or_die()
     if [ ${TRY_COUNT} -ge ${MAX_RETRIES} ]; then
       fatal_error ${LINENO} "Timed out waiting for ${FILE_NAME}."
     fi
+    TRY_COUNT=$((TRY_COUNT+1))
   done
 }
 
