@@ -60,7 +60,7 @@ make_part "/dev/mapper/${SYS_PART_NAME}" ${PV_NAME} ${PV_TYPE} ${PV_START} \
   ${PV_END}
 
 # Make the Volume group using the specific physical volume.
-make_vg ${LVM_VG_NAME} ${LVM_PV_NAME}
+make_vg ${VG_NAME} ${PV_NAME}
 
 # Create the swap and root partition for the system.
 make_lv ${SWAP_LV_NAME} ${VG_NAME} ${SWAP_LV_FS} ${SWAP_LV_SIZE}

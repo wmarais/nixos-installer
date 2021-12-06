@@ -110,13 +110,14 @@ make_part()
         "/dev/disk/by-partlabel/${NAME}" -d -
       check_error ${LINENO} "Failed to create encrypted partition."
 
+      echo "Opening ${NAME}....."
       echo ${PASSWD} | cryptsetup --type luks1 -q luksOpen \
         "/dev/disk/by-partlabel/${NAME}" ${NAME} -d -
       check_error ${LINENO} "Failed to open encrypted partition."
-      wait_or_die "/dev/mapper/${NAME}"
       ;;
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
+      wait_or_die "/dev/mapper/${NAME}"
       pvcreate "/dev/mapper/${NAME}"
       ;;
     *)
@@ -134,6 +135,8 @@ make_vg()
   VG_NAME=$1
   shift
   PHYSICAL_VOLUMES=("$@")
+
+  print_info ${LINENO} "Creating volume group \"${VG_NAME}\" on ${PHYSICAL_VOLUMES[@]}"
 
   vgcreate ${VG_NAME} ${PHYSICAL_VOLUMES[@]}
   check_error ${LINENO} "Failed to create volume group: ${VG_NAME}."
