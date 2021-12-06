@@ -106,12 +106,12 @@ make_part()
       ;;
     "crypt")
       echo "Encrypting ${NAME}....."
-      cryptsetup --type luks1 -q luksFormat "/dev/disk/by-partlabel/${NAME}" \
-        ${PASSWD}
+      echo ${PASSWD} | cryptsetup --type luks1 -q luksFormat \
+        "/dev/disk/by-partlabel/${NAME}" -d -
       check_error ${LINENO} "Failed to create encrypted partition."
 
-      cryptsetup --type luks1 -q luksOpen "/dev/disk/by-partlabel/${NAME}" \
-        ${NAME} ${PASSWD}
+      echo ${PASSWD} | cryptsetup --type luks1 -q luksOpen \
+        "/dev/disk/by-partlabel/${NAME}" ${NAME} -d -
       check_error ${LINENO} "Failed to open encrypted partition."
       ;;
     "lvm")
