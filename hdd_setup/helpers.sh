@@ -173,6 +173,8 @@ make_lv()
     "swap")
       mkswap "/dev/${VG_NAME}/${LV_NAME}"
       check_error ${LINENO} "Failed to create swap file system."
+      swapon "/dev/${VG_NAME}/${LV_NAME}"
+      check_error ${LINENO} "Failed to enable swap."
       ;;
     *)
       mkfs.ext4 "/dev/${VG_NAME}/${LV_NAME}"
