@@ -26,14 +26,16 @@
   networking.interfaces.ens33.useDHCP = true;
 
   # Disable root logins.
-  users.users.root = {
-    hashedPassword="!";
-  };
+  users.users = {
+    mutableUsers = false;
+    root = {
+      hashedPassword = "!";
+    };
 
-  # Create a sudo enabled user account.
-  users.users.admin = {
-    isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    admin = {
+      isNormalUser = true;
+      extraGroups = [ "wheel" ];
+    };
   };
 
   # Install the default packages.
