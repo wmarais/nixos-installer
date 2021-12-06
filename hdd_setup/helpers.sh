@@ -68,8 +68,10 @@ make_part()
   # of installation and is not written to ROM at any point.
   PASSWD=$6
 
+  echo "Creating partition: ${NAME} on ${HDD}....."
+
   # Create the partition.
-  parted -s -a optimal mkpart ${HDD} ${NAME} ${START} ${END}
+  parted -s -a optimal ${HDD} mkpart ${NAME} ${START} ${END}
   check_error ${LINENO} "Failed to create partition."
 
   # Set the name of the partition.
@@ -79,9 +81,11 @@ make_part()
   # Check what should be done with the partition.
   case "${TYPE}" in
     "efi")
+      echo "Creating FAT32 filesystem for ${NAME}....."
       mkfs.vfat -F 32 "/dev/disk/by-label/${NAME}"
       ;;
     "crypt")
+      echo "Encrypting ${NAME}....."
       cryptsetup --type luks1 -q luksFormat "/dev/disk/by-label/${NAME}" \
         ${PASSWD}
       check_error ${LINENO} "Failed to create encrypted partition."
@@ -91,9 +95,11 @@ make_part()
       check_error ${LINENO} "Failed to open encrypted partition."
       ;;
     "lvm")
+      echo "Making ${NAME} an LVM physical volume....."
       pvcreate "/dev/disk/by-label/${NAME}"
       ;;
     *)
+      echo "Creating ext4 filesystem for ${NAME}....."
       mkfs.ext4 "/dev/disk/by-label/${NAME}"
       ;;
   esac
