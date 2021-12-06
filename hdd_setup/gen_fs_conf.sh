@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 MODE=$1
 EFI_PART_NAME=$2
