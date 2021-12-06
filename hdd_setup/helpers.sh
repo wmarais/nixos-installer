@@ -32,6 +32,22 @@ make_gpt()
   check_error ${LINENO} "Failed to create GPT partition table on $1."
 }
 
+wait_or_die()
+{
+  FILE_NAME=$1
+  MAX_RETRIES=$2
+
+  TRY_COUNT=0
+  
+  while [ ! -f ${FILE_NAME} ]; do
+    echo "Waiting for device ${FILE_NAME} to become available ....."
+    sleep 1s
+    if [ ${TRY_COUNT} -ge ${MAX_RETRIES} ]; then
+      fatal_error ${LINENO} "Timed out waiting for ${FILE_NAME}."
+    fi
+  done
+}
+
 ################################################################################
 #
 ################################################################################
@@ -73,6 +89,9 @@ make_part()
   # Create the partition.
   parted -s -a optimal ${HDD} mkpart ${NAME} ${START} ${END}
   check_error ${LINENO} "Failed to create partition."
+
+  # Wait for the parition to become available.
+  wait_or_die ${NAME} 5
 
   # Set the name of the partition.
   #parted -s name ${HDD}${NUM} ${NAME}
