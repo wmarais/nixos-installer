@@ -113,6 +113,7 @@ make_part()
       echo ${PASSWD} | cryptsetup --type luks1 -q luksOpen \
         "/dev/disk/by-partlabel/${NAME}" ${NAME} -d -
       check_error ${LINENO} "Failed to open encrypted partition."
+      wait_or_die "/dev/mapper/${NAME}"
       ;;
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
