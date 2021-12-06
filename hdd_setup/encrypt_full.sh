@@ -68,7 +68,7 @@ make_lv ${ROOT_LV_NAME} ${VG_NAME} ${ROOT_LV_FS} ${ROOT_LV_SIZE}
 
 # Mount the partition for installation.
 mount_part "/dev/${VG_NAME}/${ROOT_LV_NAME}" "/mnt"
-mount_part "/dev/disk/by-label/${EFI_PART_NAME}" "/mnt/boot/efi"
+mount_part "/dev/disk/by-partlabel/${EFI_PART_NAME}" "/mnt/boot/efi"
 
 # Write the hardware configuration.
 $(dirname "$0")/encrypt_full_hw_config.sh ${EFI_PART_NAME} ${SWAP_LV_NAME} \

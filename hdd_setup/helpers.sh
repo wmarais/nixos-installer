@@ -102,25 +102,25 @@ make_part()
   case "${TYPE}" in
     "efi")
       echo "Creating FAT32 filesystem for ${NAME}....."
-      mkfs.vfat -F 32 "/dev/disk/by-label/${NAME}"
+      mkfs.vfat -F 32 "/dev/disk/by-partlabel/${NAME}"
       ;;
     "crypt")
       echo "Encrypting ${NAME}....."
-      cryptsetup --type luks1 -q luksFormat "/dev/disk/by-label/${NAME}" \
+      cryptsetup --type luks1 -q luksFormat "/dev/disk/by-partlabel/${NAME}" \
         ${PASSWD}
       check_error ${LINENO} "Failed to create encrypted partition."
 
-      cryptsetup --type luks1 -q luksOpen "/dev/disk/by-label/${NAME}" \
+      cryptsetup --type luks1 -q luksOpen "/dev/disk/by-partlabel/${NAME}" \
         ${NAME} ${PASSWD}
       check_error ${LINENO} "Failed to open encrypted partition."
       ;;
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
-      pvcreate "/dev/disk/by-label/${NAME}"
+      pvcreate "/dev/disk/by-partlabel/${NAME}"
       ;;
     *)
       echo "Creating ext4 filesystem for ${NAME}....."
-      mkfs.ext4 "/dev/disk/by-label/${NAME}"
+      mkfs.ext4 "/dev/disk/by-partlabel/${NAME}"
       ;;
   esac
 }
