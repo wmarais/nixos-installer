@@ -39,7 +39,7 @@ wait_or_die()
 
   TRY_COUNT=0
   
-  while [ ! -f ${FILE_NAME} ]; do
+  while [[ ! -f ${FILE_NAME} && ! -L ${FILE_NAME} ]]; do
     echo "Waiting for device ${FILE_NAME} to become available ....."
     sleep 1s
     if [ ${TRY_COUNT} -ge ${MAX_RETRIES} ]; then
