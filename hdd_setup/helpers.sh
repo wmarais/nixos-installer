@@ -92,7 +92,7 @@ make_part()
   check_error ${LINENO} "Failed to create partition."
 
   # Wait for the parition to become available.
-  wait_or_die ${NAME} 5
+  wait_or_die "/dev/disk/by-label/${NAME}" 5
 
   # Set the name of the partition.
   #parted -s name ${HDD}${NUM} ${NAME}
