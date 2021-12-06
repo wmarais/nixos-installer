@@ -26,8 +26,8 @@
   networking.interfaces.ens33.useDHCP = true;
 
   # Disable root logins.
+  users.mutableUsers = false;
   users.users = {
-    mutableUsers = false;
     root = {
       hashedPassword = "!";
     };
