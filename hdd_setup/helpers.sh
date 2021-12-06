@@ -117,7 +117,7 @@ make_part()
       ;;
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
-      pvcreate "/dev/disk/by-partlabel/${NAME}"
+      pvcreate "/dev/mapper/${NAME}"
       ;;
     *)
       echo "Creating ext4 filesystem for ${NAME}....."
