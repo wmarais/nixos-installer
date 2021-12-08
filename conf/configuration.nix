@@ -11,6 +11,7 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       ./conf/fs.nix
+      ./conf/users.nix
     ];
 
   # networking.hostName = "nixos"; # Define your hostname.
