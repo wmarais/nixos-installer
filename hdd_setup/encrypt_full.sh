@@ -3,7 +3,7 @@
 # partition. That is the root parttition (including /boot) and swap partition
 # is fully encrypted.
 HDD=$1
-SYS_PART_PASSWD=$2
+SYS_PART_KEY=$2
 
 # Configure information for the EFI partition.
 EFI_PART_NAME="EFI"
@@ -46,7 +46,7 @@ make_part ${HDD} ${EFI_PART_NAME} ${EFI_PART_TYPE} ${EFI_PART_START} \
 
 # Create the encrypted partition.
 make_part ${HDD} ${SYS_PART_NAME} ${SYS_PART_TYPE} ${SYS_PART_START} \
-  ${SYS_PART_END} ${SYS_PART_PASSWD}
+  ${SYS_PART_END} ${SYS_PART_KEY}
 
 # Create a LVM physical volume on the encrypted partition.
 make_pv "/dev/mapper/${SYS_PART_NAME}"

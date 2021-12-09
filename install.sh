@@ -20,6 +20,14 @@ validate_args() {
       ehco "An ecryption key must be specified using -k or --key."
     fi
   fi
+
+  echo "HDD = ${HDD}"
+  echo "USER = ${USER}"
+  echo "PASSWORD = ${PASSWORD}"
+  echo "HOSTNAME = ${HOSTNAME}"
+  echo "ENCRYPT = ${ENCRYPT}"
+  echo "KEY = ${KEY}"
+  echo "TYPE = ${TYPE}"
 }
 
 ################################################################################
@@ -54,11 +62,11 @@ validate_args
 # Configure the hard-drive.
 case ${ENCRYPT} in
   "full")
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${PASSWORD}
+    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
     ;;
   
   "root")
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${PASSWORD}
+    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
     ;;
 
   *)
@@ -87,7 +95,7 @@ echo "{ config, pkgs, ... }:
     ${USER} = {
       isNormalUser = true;
       extraGroups = [ \"wheel\" ];
-      hashedPassword = \"$(mkpasswd -m sha-512)\";
+      hashedPassword = \"$(echo ${PASSWORD} | mkpasswd -m sha-512)\";
     };
   };
 }" >> /mnt/etc/nixos/conf/users.nix
