@@ -101,4 +101,4 @@ echo "{ config, pkgs, ... }:
 }" >> /mnt/etc/nixos/conf/users.nix
 
 # Rebuild the distribution.
-nixos-install
+nixos-install --no-root-passwd

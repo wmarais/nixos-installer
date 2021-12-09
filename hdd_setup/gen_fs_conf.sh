@@ -55,7 +55,7 @@ ENC_ROOT_FS_CONF="{ config, pkgs, ... }:
   };
 
   fileSystems.\"/boot/efi\" = {
-    device = \"/dev/disk/by-label/${EFI_PART_NAME}\";
+    device = \"/dev/disk/by-partlabel/${EFI_PART_NAME}\";
     fsType = \"vfat\";
   };
 
@@ -109,7 +109,7 @@ ENC_FULL_FS_CONF="{ config, pkgs, ... }:
 
   # Set the efi partition.
   fileSystems.\"/boot/efi\" = {
-    device = \"/dev/disk/by-label/${EFI_PART_NAME}\";
+    device = \"/dev/disk/by-partlabel/${EFI_PART_NAME}\";
     fsType = \"vfat\";
   };
 
