@@ -95,7 +95,7 @@ echo "{ config, pkgs, ... }:
     ${USER} = {
       isNormalUser = true;
       extraGroups = [ \"wheel\" ];
-      hashedPassword = \"$(echo ${PASSWORD} | mkpasswd -m sha-512)\";
+      hashedPassword = \"$(mkpasswd -m sha-512 ${PASSWORD})\";
     };
   };
 }" >> /mnt/etc/nixos/conf/users.nix
