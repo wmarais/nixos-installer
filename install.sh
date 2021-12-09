@@ -9,7 +9,7 @@ KEY=""
 TYPE=""
 
 # Include the common helper functions.
-. $(dirname "$0")/helpers.sh
+. $(dirname "$0")/hdd_setup/helpers.sh
 
 ################################################################################
 # Check whether the combination of arguments look sensible.

@@ -5,6 +5,8 @@
 HDD=$1
 SYS_PART_KEY=$2
 
+
+
 # Configure information for the EFI partition.
 EFI_PART_NAME="EFI"
 EFI_PART_TYPE="efi"
@@ -36,6 +38,9 @@ ROOT_LV_FS="ext4"
 
 # Make sure the script is executed as root.
 must_be_root ${LINENO}
+
+echo "HDD = ${HDD}"
+echo "KEY = ${SYS_PART_KEY}"
 
 # Create a new GPT partition table on the specified HDD.
 make_gpt ${HDD}

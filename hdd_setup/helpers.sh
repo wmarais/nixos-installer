@@ -131,8 +131,7 @@ make_pv()
 {
   HDD=$1
   pvcreate ${HDD}
-
-
+  check_error ${LINENO} "Failed to create physical volume: ${HDD_NAME}."
 }
 
 ################################################################################
