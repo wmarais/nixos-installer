@@ -5,34 +5,20 @@
 # https://nixos.org/manual/nixos/stable/options.html
 
 { config, pkgs, ... }:
-
 {
   imports =
   [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
     ./conf/fs.nix
-    ./conf/users.nix
-    ./conf/network.nix
-    ./conf/maintenance.nix
+
     ./conf/desktop.nix
     ./conf/guest.sh
+    ./conf/maintenance.nix
+    ./conf/network.nix
+    ./conf/users.nix
   ];
   # Set your time zone.
   time.timeZone = "Australia/Adelaide";
-
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
-  networking.useDHCP = false;
-  networking.interfaces.ens33.useDHCP = true;
-
-  # Disable root logins.
-  users.mutableUsers = false;
-  users.users = {
-    root = {
-      hashedPassword = "!";
-    };
-  };
 
   # Install the default packages.
   environment.systemPackages = with pkgs; [
@@ -40,12 +26,6 @@
     wget
     htop
   ];
-
-  # Enable SSH and disable root logins.
-  services.openssh = {
-    enable = true;
-    permitRootLogin = "no";
-  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

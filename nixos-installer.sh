@@ -27,7 +27,6 @@ VBOX_GUEST="false"
 VMWARE_GUEST="false"
 X11_GUEST="false"
 
-
 # Include the common helper functions.
 . $(dirname "$0")/hdd_setup/helpers.sh
 
@@ -76,6 +75,7 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
+# Makre sure the script is run as root.
 must_be_root ${LINENO}
 
 # Check that the script args are valid.
