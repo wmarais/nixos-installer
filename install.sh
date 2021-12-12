@@ -66,11 +66,11 @@ case ${ENCRYPT} in
     ;;
   
   "root")
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
+    $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
     ;;
 
   *)
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD}
+    $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
     ;;
 esac
 
