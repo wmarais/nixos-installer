@@ -66,8 +66,7 @@ make_part ${HDD} ${SYS_PART_NAME} ${SYS_PART_TYPE} ${SYS_PART_START} \
   ${SYS_PART_END} ${SYS_PART_PASSWD}
 
 # Make the LVM physical volume ontop of the encrypted partition.
-make_part "/dev/mapper/${SYS_PART_NAME}" ${PV_NAME} ${PV_TYPE} ${PV_START} \
-  ${PV_END}
+make_pv "/dev/mapper/${SYS_PART_NAME}"
 
 # Make the volume group using the specific physical volume.
 make_vg ${LVM_VG_NAME} ${LVM_PV_NAME}
