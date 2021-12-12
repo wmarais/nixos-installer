@@ -70,8 +70,8 @@ make_lv ${ROOT_LV_NAME} ${VG_NAME} ${ROOT_LV_FS} ${ROOT_LV_SIZE}
 
 # Mount the partition for installation.
 mount_part "/dev/${VG_NAME}/${ROOT_LV_NAME}" "/mnt"
-mount_part "/dev/disk/by-label/${BOOT_PART_NAME}" "/mnt/boot"
-mount_part "/dev/disk/by-label/${EFI_PART_NAME}" "/mnt/boot/efi"
+mount_part "/dev/disk/by-partlabel/${BOOT_PART_NAME}" "/mnt/boot"
+mount_part "/dev/disk/by-partlabel/${EFI_PART_NAME}" "/mnt/boot/efi"
 
 # If this point was reached, the script was successfully executed.
 exit 0
