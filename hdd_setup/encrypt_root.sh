@@ -7,7 +7,7 @@ HDD=$1
 SYS_PART_PASSWD=$2
 
 # Configure information for the EFI partition.
-EFI_PART_NAME="efi"
+EFI_PART_NAME="EFI"
 EFI_PART_TYPE="efi"
 EFI_PART_START="1MiB"
 EFI_PART_END="500MiB"
