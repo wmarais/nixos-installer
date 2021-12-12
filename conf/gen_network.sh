@@ -25,7 +25,7 @@ while [ "$#" -gt 0 ]; do
   case "$1" in
     --host-name=*)    HOST_NAME="${1#*=}"; shift 1;;
     --eth-dhcp=*)     ETH_DHCP="${1#*=}"; shift 1;;
-    --wifi-enable)    WIFI_ENABLE="true"; shift 1;;
+    --wifi-enable=*)  WIFI_ENABLE="${1#*=}"; shift 1;;
     --wifi-ssid=*)    WIFI_SSID="${1#*=}"; shift 1;;
     --wifi-passwd=*)  WIFI_PASSWD="${1#*=}"; shift 1;;
     *)                echo "invalid argument: $1" >&2; exit 1;;
