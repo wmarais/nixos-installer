@@ -35,14 +35,14 @@ STR_DESKTOP="\
   service = {
     xserver = {
       enable = true;
-      layout = "us";
+      layout = \"us\";
       libinput.enable = true;
 
       # Make lightdm the default Display Manager and XFCE the default Desktop
       # Manager.
       displayManager = {
         lightdm.enable = true;
-        defaultSession = "xfce";
+        defaultSession = \"xfce\";
       };
 
       # Enable XCE as an available Desktop Manager.
