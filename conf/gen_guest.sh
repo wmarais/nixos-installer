@@ -43,14 +43,5 @@ STR_VBOX="\
   virtualisation.vmware.guest.headless = ${VMWARE_HEADLESS};
 }"
 
-STR_VBOX_EMPTY="\
-{ config, pkgs, ... }:
-{
-}"
-
-# Generate the virtualbox configuration.
-if [ "${VBOX_GUEST}" = "true" ]; then
-  echo "${STR_VBOX}" > ${CONF_FILE}
-else
-  echo "${STR_VBOX_EMPTY}" > ${CONF_FILE}
-fi
+# Generate the configuration.
+echo "${STR_VBOX}" > ${CONF_FILE}
