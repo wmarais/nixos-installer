@@ -32,7 +32,7 @@ STR_DESKTOP="\
   hardware.opengl.enable = true;
 
   # Configure the services required for a desktop.
-  service = {
+  services = {
     xserver = {
       enable = true;
       layout = \"us\";

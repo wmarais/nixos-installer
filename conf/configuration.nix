@@ -12,7 +12,7 @@
     ./conf/fs.nix
 
     ./conf/desktop.nix
-    ./conf/guest.sh
+    ./conf/guest.nix
     ./conf/maintenance.nix
     ./conf/network.nix
     ./conf/users.nix

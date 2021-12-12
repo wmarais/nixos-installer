@@ -9,7 +9,7 @@ ETH_DHCP=""
 # Whether to enable WiFi or not. Even if you dont specify a SSID or PASSWD, 
 # turn this on if you intend to run WiFi. That way the wpa_supplication tools
 # will be installed.
-WIFI_ENABLE=""
+WIFI_ENABLE="false"
 
 # The name of the network to connect too.
 WIFI_SSID=""
@@ -51,7 +51,7 @@ STR_NETWORK="\
     userControlled.enable = ${WIFI_ENABLE};
   };
 
-  networking.userDHCP = false;"
+  networking.useDHCP = false;"
 
 # Generate the WiFi configuration file.
 if [ "${WIFI_SSID}" != "" ]; then
