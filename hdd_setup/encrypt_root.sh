@@ -24,13 +24,6 @@ SYS_PART_TYPE="crypt"
 SYS_PART_START="1001MiB"
 SYS_PART_END="100%"
 
-# The configuration of the LVM logical volume that sits ontop of the encrypted
-# volume.
-PV_NAME="system-pv"
-PV_TYPE="lvm"
-PV_START="0%"
-PV_END="100%"
-
 # The configuration of the LVM volume group.
 VG_NAME="system-vg"
 
@@ -69,7 +62,7 @@ make_part ${HDD} ${SYS_PART_NAME} ${SYS_PART_TYPE} ${SYS_PART_START} \
 make_pv "/dev/mapper/${SYS_PART_NAME}"
 
 # Make the volume group using the specific physical volume.
-make_vg ${LVM_VG_NAME} ${LVM_PV_NAME}
+make_vg ${LVM_VG_NAME} "/dev/mapper/${SYS_PART_NAME}"
 
 # Create the swap and root partition for the system.
 make_lv ${SWAP_LV_NAME} ${VG_NAME} ${SWAP_LV_FS} ${SWAP_LV_SIZE}

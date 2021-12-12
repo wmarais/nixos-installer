@@ -5,8 +5,6 @@
 HDD=$1
 SYS_PART_KEY=$2
 
-
-
 # Configure information for the EFI partition.
 EFI_PART_NAME="EFI"
 EFI_PART_TYPE="efi"
