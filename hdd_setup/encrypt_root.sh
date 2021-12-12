@@ -21,7 +21,7 @@ BOOT_PART_END="1000MiB"
 # HDD is allocated to the system partition.
 SYS_PART_NAME="system-crypt"
 SYS_PART_TYPE="crypt"
-SYS_PART_START="1001iB"
+SYS_PART_START="1001MiB"
 SYS_PART_END="100%"
 
 # The configuration of the LVM logical volume that sits ontop of the encrypted
