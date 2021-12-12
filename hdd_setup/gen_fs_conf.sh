@@ -49,6 +49,14 @@ ENC_ROOT_FS_CONF="{ config, pkgs, ... }:
     efiSupport = true;
   };
 
+  # Configure luks so that disk must be decrypted then start LVM.
+  boot.initrd.luks.devices = {
+    root = {
+      device = \"/dev/disk/by-partlabel/${SYS_PART_NAME}\";
+      preLVM = true;
+    };
+	};
+
   fileSystems.\"/\" = { 
     device = \"/dev/${VG_NAME}/${ROOT_LV_NAME}\";
     fsType = \"ext4\";
