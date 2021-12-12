@@ -53,7 +53,7 @@ while [ "$#" -gt 0 ]; do
     --user=*)         USER="${1#*=}"; shift 1;;
     --password=*)     PASSWORD="${1#*=}"; shift 1;;
     --host-name=*)    HOST_NAME="${1#*=}"; shift 1;;
-    --encrypt=*)      ENCRPT="${1#*=}"; shift 1;;
+    --encrypt=*)      ENCRYPT="${1#*=}"; shift 1;;
     --key=*)          KEY="${1#*=}"; shift 1;;
     --type=*)         TYPE="${1#*=}"; shift 1;;
     --time-zone=*)    TIME_ZONE="${1#*=}"; shift 1;;
