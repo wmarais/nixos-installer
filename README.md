@@ -4,6 +4,10 @@ without some expert knowledge. It is also quite labor intensive to perform the
 first configuration. The script warps up the installation actions as documented
 at: https://nixos.org/manual/nixos/stable/.
 
+* Garbage Collection: 
+
+
+
 ## HOWTO
 For installation, networking is required. Only four steps are required:
 
@@ -75,5 +79,13 @@ sudo ./nixos-installer.sh \
       no encryption (none) is used, then this argument has no effect. 
 
 -t    The type of environment that will be deployed.
+
+--host-name     The name of the host.
+
+--time-zone     The time zone to set the host too.
+
+--wifi-ssid     The name of the wireless network to connect too.
+
+--wifi-passwd   The password for the wireless network to connect too.
 
 ```

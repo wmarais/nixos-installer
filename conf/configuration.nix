@@ -8,15 +8,15 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./conf/fs.nix
-      ./conf/users.nix
-    ];
-
-  # networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
+  [ # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./conf/fs.nix
+    ./conf/users.nix
+    ./conf/network.nix
+    ./conf/maintenance.nix
+    ./conf/desktop.nix
+    ./conf/guest.sh
+  ];
   # Set your time zone.
   time.timeZone = "Australia/Adelaide";
 
@@ -31,11 +31,6 @@
   users.users = {
     root = {
       hashedPassword = "!";
-    };
-
-    admin = {
-      isNormalUser = true;
-      extraGroups = [ "wheel" ];
     };
   };
 
