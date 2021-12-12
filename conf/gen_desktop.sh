@@ -59,8 +59,13 @@ STR_DESKTOP="\
   };
 }"
 
+STR_DESKTOP_EMPTY="\
+{ config, pkgs, ... }:
+{
+}"
+
 if [ "${TYPE}" == "desktop" ]; then
   echo "${STR_DESKTOP}" > ${CONF_FILE}
 else
-  echo "" > ${CONF_FILE}
+  echo "${STR_DESKTOP_EMPTY}" > ${CONF_FILE}
 fi
