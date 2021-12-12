@@ -73,5 +73,9 @@ mount_part "/dev/${VG_NAME}/${ROOT_LV_NAME}" "/mnt"
 mount_part "/dev/disk/by-partlabel/${BOOT_PART_NAME}" "/mnt/boot"
 mount_part "/dev/disk/by-partlabel/${EFI_PART_NAME}" "/mnt/boot/efi"
 
+# Write the filesystem configuration. This includes the grub configuration.
+$(dirname "$0")/gen_fs_conf.sh "encrypt_root" ${EFI_PART_NAME} \
+  ${SYS_PART_NAME} ${VG_NAME} ${SWAP_LV_NAME} ${ROOT_LV_NAME}
+
 # If this point was reached, the script was successfully executed.
 exit 0
