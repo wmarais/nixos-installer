@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # The configuration file that will be generated.
 CONF_FILE="/mnt/etc/nixos/conf/desktop.nix"

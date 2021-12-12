@@ -23,7 +23,7 @@ done
 
 # Check if the vmware additions must be installed headless.
 VMWARE_HEADLESS="true"
-if [ "${X11_GUEST}" == "true" ]; then
+if [ "${X11_GUEST}" = "true" ]; then
   VMWARE_HEADLESS="false"
 fi
 
@@ -44,7 +44,7 @@ STR_VBOX="\
 }"
 
 # Generate the virtualbox configuration.
-if [ "${VBOX_GUEST}" == "true" ]; then
+if [ "${VBOX_GUEST}" = "true" ]; then
   echo "${STR_VBOX}" > ${CONF_FILE}
 else
   echo "" > ${CONF_FILE}

@@ -37,7 +37,4 @@ STR_USERS="\
   };
 }"
 
-echo "USER=${USER}"
-echo "PASSWORD=${PASSWORD}"
-
 echo "${STR_USERS}" > ${CONF_FILE}
