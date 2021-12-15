@@ -18,7 +18,7 @@ PV_PART_END="100%"
 
 # The LVM Volume Group configuration.
 VG_NAME="system-vg"
-VG_PVS=("/dev/mapper/${PV_PART_NAME}")
+VG_PVS=("/dev/disk/by-partlabel/${PV_PART_NAME}")
 
 # The Swap Logical Volume.
 SWAP_LV_NAME="swap-lv"
