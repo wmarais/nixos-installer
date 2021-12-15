@@ -39,7 +39,7 @@ STR_VBOX="\
   virtualisation.virtualbox.guest.x11 = ${X11_GUEST};
 
   # Enable vmware guest additions.
-  virtualisation.vmware.guest = ${VMWARE_GUEST};
+  virtualisation.vmware.guest.enable = ${VMWARE_GUEST};
   virtualisation.vmware.guest.headless = ${VMWARE_HEADLESS};
 }"
 
