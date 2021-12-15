@@ -94,10 +94,6 @@ make_part()
   # Wait for the parition to become available.
   wait_or_die "/dev/disk/by-partlabel/${NAME}" 5
 
-  # Set the name of the partition.
-  #parted -s name ${HDD}${NUM} ${NAME}
-  #check_error ${LINENO} "Failed to set partition name."
-
   # Check what should be done with the partition.
   case "${TYPE}" in
     "efi")
