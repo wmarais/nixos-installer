@@ -118,7 +118,7 @@ make_part()
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
       wait_or_die "/dev/disk/by-partlabel/${NAME}"
-      pvcreate "/dev/disk/by-partlabel/${NAME}"
+      pvcreate -ff "/dev/disk/by-partlabel/${NAME}"
       check_error ${LINENO} "Failed to create LVM physical volume."
       ;;
     *)
@@ -131,7 +131,7 @@ make_part()
 make_pv()
 {
   HDD=$1
-  pvcreate ${HDD}
+  pvcreate -ff ${HDD}
   check_error ${LINENO} "Failed to create physical volume: ${HDD_NAME}."
 }
 
