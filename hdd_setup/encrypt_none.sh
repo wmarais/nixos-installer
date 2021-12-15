@@ -23,7 +23,7 @@ VG_PVS=("/dev/disk/by-partlabel/${PV_PART_NAME}")
 # The Swap Logical Volume.
 SWAP_LV_NAME="swap-lv"
 SWAP_LV_SIZE="2G"
-SWAP_LV_FS="linux-swap"
+SWAP_LV_FS="swap"
 
 # The Root Logical Volume.
 ROOT_LV_NAME="root-lv"
