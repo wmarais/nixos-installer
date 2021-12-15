@@ -49,12 +49,6 @@ STR_DESKTOP="\
       desktopManager = {
         xfce.enable = true;
       };
-
-      # Let the screen lock automatically after 2 minutes.
-      xautolock = {
-        enable = true;
-        time = 2;
-      };
     };
   };
 }"
