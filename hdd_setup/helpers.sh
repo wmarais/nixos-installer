@@ -42,7 +42,7 @@ wait_or_die()
   while [[ ! -f ${FILE_NAME} && ! -L ${FILE_NAME} ]]; do
     echo "Waiting for device ${FILE_NAME} to become available ....."
     sleep 1s
-    if [ ${TRY_COUNT} -ge ${MAX_RETRIES} ]; then
+    if [ "${TRY_COUNT}" -ge "${MAX_RETRIES}" ]; then
       fatal_error ${LINENO} "Timed out waiting for ${FILE_NAME}."
     fi
     TRY_COUNT=$((TRY_COUNT+1))
@@ -117,8 +117,9 @@ make_part()
       ;;
     "lvm")
       echo "Making ${NAME} an LVM physical volume....."
-      wait_or_die "/dev/mapper/${NAME}"
-      pvcreate "/dev/mapper/${NAME}"
+      wait_or_die "/dev/disk/by-partlabel/${NAME}"
+      pvcreate "/dev/disk/by-partlabel/${NAME}"
+      check_error ${LINENO} "Failed to create LVM physical volume."
       ;;
     *)
       echo "Creating ext4 filesystem for ${NAME}....."

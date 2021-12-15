@@ -50,6 +50,7 @@ validate_args() {
 # Parse the arguments to the script.
 while [ "$#" -gt 0 ]; do
   case "$1" in
+    --hdd=*)          HDD="${1#*=}"; shift 1;;
     --user=*)         USER="${1#*=}"; shift 1;;
     --password=*)     PASSWORD="${1#*=}"; shift 1;;
     --host-name=*)    HOST_NAME="${1#*=}"; shift 1;;
@@ -128,3 +129,5 @@ ${GEN_PATH}/gen_guest.sh --vbox=${VBOX_GUEST} --vmware=${VMWARE_GUEST} \
 
 # Rebuild the distribution.
 nixos-install --no-root-passwd
+
+exit 0
