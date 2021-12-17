@@ -64,7 +64,7 @@ print_info()
 
   # Only print the message if the script is not told to be quiet.
   if [ "${QUIET}" = "false" ]; then
-    echo "INFO | $1 | $2" >&1
+    echo "INFO | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&1
   fi
 
   return 0
