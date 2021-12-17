@@ -98,7 +98,7 @@ wait_or_die()
       "Waiting for device ${FILE_NAME} to become available ....."
 
     # Sleep for a second before trying again.
-    sleep 1s
+    sleep 1
 
     # Check if there are more time to retry.
     if [ "${TRY_COUNT}" -ge "${MAX_RETRIES}" ]; then
