@@ -82,7 +82,7 @@ wait_or_die()
   LINE_NUM=$2
 
   # The file to wait on.
-  PATH=$3
+  FILE_PATH=$3
 
   # The number of seconds / retries to wait for.
   MAX_RETRIES=$4
@@ -92,23 +92,29 @@ wait_or_die()
   
   # Keep waiting for the file to become available until the timeout period
   # expires.
-  while [[ ! -f "${PATH}" && ! -L "${PATH}" ]]; do
+  while [[ ! -f "${FILE_PATH}" && ! -L "${FILE_PATH}" ]]; do
 
     print_info "${FILE_NAME}" "${LINENO}" \
-      "Waiting for device ${FILE_NAME} to become available ....."
+      "Waiting for device ${FILE_PATH} to become available ....."
 
     # Sleep for a second before trying again.
     sleep 1
 
     # Check if there are more time to retry.
     if [ "${TRY_COUNT}" -ge "${MAX_RETRIES}" ]; then
-      fatal_error "${FILE_NAME}" "${LINENO}" \
-        "Timed out waiting for ${FILE_NAME}."
+      break
     fi
 
     # Increment the retry counter.
     TRY_COUNT=$((TRY_COUNT+1))
   done
+
+    # Check if there are more time to retry.
+  if [ "${TRY_COUNT}" -ge "${MAX_RETRIES}" ]; then
+    return 1
+  fi
+
+  return 0
 }
 
 ################################################################################
@@ -119,7 +125,8 @@ must_be_root()
   # Check if the current USER ID is 0 which indicates that the script is
   # executed as root.
   if [ "${EUID}" -ne "0" ]; then
-    fatal_error $1 "The script must be executed as root."
+    fatal_error "${FILE_NAME}" "${LINENO}" \
+      "The script must be executed as root."
   fi
 }
 
