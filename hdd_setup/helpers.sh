@@ -111,22 +111,20 @@ make_part()
         "/dev/disk/by-partlabel/${NAME}" ${NAME} --key-file=-
       check_error ${LINENO} "Failed to open encrypted partition."
       ;;
-    "lvm")
-      echo "Making ${NAME} an LVM physical volume....."
-      wait_or_die "/dev/disk/by-partlabel/${NAME}"
-      pvcreate -ff "/dev/disk/by-partlabel/${NAME}"
-      check_error ${LINENO} "Failed to create LVM physical volume."
-      ;;
     *)
       echo "Creating ext4 filesystem for ${NAME}....."
-      mkfs.ext4 "/dev/disk/by-partlabel/${NAME}"
+      mkfs.ext4 -q -F "/dev/disk/by-partlabel/${NAME}"
       ;;
   esac
 }
 
+################################################################################
+# Create a Physical Volume that can be used in an LVM Volume Group.
+################################################################################
 make_pv()
 {
   HDD=$1
+  echo "Creating LVM physical volume on ${HDD}."
   pvcreate -f -y -q ${HDD}
   check_error ${LINENO} "Failed to create physical volume: ${HDD_NAME}."
 }

@@ -43,9 +43,12 @@ make_gpt ${HDD}
 make_part ${HDD} ${EFI_PART_NAME} ${EFI_PART_TYPE} ${EFI_PART_START} \
   ${EFI_PART_END}
 
-# Create the LVM Physical Partition
+# Create the partition that will be used of the LVM physical volume.
 make_part ${HDD} ${PV_PART_NAME} ${PV_PART_TYPE} ${PV_PART_START} \
   ${PV_PART_END}
+
+# Create the LVM physical volume.
+make_pv "/dev/disk/by-partlabel/${PV_PART_NAME}"
 
 # Create the system volume group.
 make_vg ${VG_NAME} ${VG_PVS[@]}
