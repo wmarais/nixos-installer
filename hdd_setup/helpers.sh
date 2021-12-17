@@ -127,7 +127,7 @@ make_part()
 make_pv()
 {
   HDD=$1
-  pvcreate -ff ${HDD}
+  pvcreate -f -y -q ${HDD}
   check_error ${LINENO} "Failed to create physical volume: ${HDD_NAME}."
 }
 
@@ -142,7 +142,7 @@ make_vg()
 
   echo "Creating volume group \"${VG_NAME}\" on ${PV[@]}"
 
-  vgcreate ${VG_NAME} ${PV[@]}
+  vgcreate -f -y -q ${VG_NAME} ${PV[@]}
   check_error ${LINENO} "Failed to create volume group: ${VG_NAME}."
 }
 
@@ -158,9 +158,9 @@ make_lv()
 
   echo "Creating logical volume \"${LV_NAME}\" on \"${VG_NAME}\"....."
   if [[ "${LV_SIZE}" == *"%"* ]]; then
-    lvcreate -l ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
+    lvcreate -q -y -l ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
   else
-    lvcreate -L ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
+    lvcreate -q -y -L ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
   fi
   check_error ${LINENO} "Failed to create logical volume: ${LV_NAME}."
 
