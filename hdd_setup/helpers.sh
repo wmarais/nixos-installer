@@ -4,7 +4,7 @@
 HELPERS_FILE_NAME="hdd_setup/helpers.sh"
 
 QUIET=false
-DEBUG=true
+DEBUG=false
 
 ################################################################################
 # Print a fatal error message.
