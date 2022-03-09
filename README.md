@@ -4,8 +4,11 @@ without some expert knowledge. It is also quite labor intensive to perform the
 first configuration. The script warps up the installation actions as documented
 at: https://nixos.org/manual/nixos/stable/.
 
+Limitations:
+* **EFI:** Only support EFI.
+* **GPT:** Only run on GPT partition table.
 
-## HOWTO
+## HOWTO - General Installation
 For installation, networking is required. Only four steps are required:
 
 1. Download the latest NixOS bootable DVD and boot it.
@@ -14,10 +17,62 @@ For installation, networking is required. Only four steps are required:
 4. Reboot.
 
 If everything went well, NixOS will now be installed. 
+## HOWTO - VirtualBox Installation
+The installer is tested on *VirtualBox 6.1.32* with matching *Oracle VM
+VirtualBox Extension Pack 6.1.32* installed. The test VM has the configuration
+below and suits the purpose of a typical software development VM. The options in
+bold red are very important. The settings in orange are important for a good
+graphical experience.
+
+Virtual Machine
+* **Name:** nixtest
+* **Type:** Linux
+* **Version:** Other Linux (64-bit)
+* **Memory Size:** 4096 MB
+
+Virtual Hard Disk
+* **File Size:** 100 GB
+* **Hard disk file type:** VDI (VirtualBox Disk Image)
+* **Storage  on physical hard disk:** Fixed Size
+
+System
+* <span style="color:red">**Enable EFI (special OSes only):**</span> Checked
+* **Processors:** 4
+
+Display
+* <span style="color:orange">**Video Memory:**</span> 128 MB
+* **Graphics Controller:** VMSVGA (default)
+* <span style="color:orange">**Enable 3D Acceleration:**</span> Checked
+
+Everything else has been left as default. NixOS is pretty space consuming,
+however if you are running garbage collection frequently, feel free to reduce
+the HDD size.
+
+The installation command(s) used:
+
+```
+$ git clone https://github.com/wmarais/nixos-installer.git
+$ cd nixos-installer
+$ sudo ./nixos-installer.sh \
+  --user=admin \
+  --password=admin \
+  --host-name=nixtest \
+  --encrypt=none \
+  --type=desktop \
+  --eth-dhcp=enp0s3 \
+  --vbox
+```
+
+NOTES:
+* GNOME seems to not work properly in VBox. During installation, simple run the
+  commands from a TTY terminal (i.e. press CTRL + ALT + F1). This is the same
+  reason why the default desktop used by this installer is LightDM and XFCE.
 
 ## TODO
 1. Network Detection: Determine which networks are connected at install time and
                       enable them by default post installation.
+2. Display Manager:  Provide more options for display managers that work in both
+                     physical and virtual deployments.
 
 # MAN PAGE
 
@@ -36,7 +91,7 @@ sudo ./nixos-installer.sh \
   --encrypt=<root|full|none> \
   --key=<key> \
   --type=<desktop|server> \
-  --eth-dhcp=<eth name>
+  --eth-dhcp=<eth name> \
 ```
 
 ## OPTIONS
