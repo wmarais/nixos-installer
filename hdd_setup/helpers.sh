@@ -1,9 +1,10 @@
 #!/bin/sh
 
 # Store the file name that will be used for error reporting.
-FILE_NAME="${0##*/}"
+HELPERS_FILE_NAME="hdd_setup/helpers.sh"
 
 QUIET=false
+DEBUG=true
 
 ################################################################################
 # Print a fatal error message.
@@ -20,7 +21,7 @@ fatal_error()
   MESSAGE="$3"
 
   # Print the error message to cerr.
-  echo "FATAL | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&2
+  echo -e "FATAL | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&2
 
   # Exit out of the script.
   exit 1
@@ -31,17 +32,20 @@ fatal_error()
 ################################################################################
 check_error() 
 {
+  # The value returned by the command.
+  RET_CODE="$1"
+
   # The file in which the function is called.
-  FILE_NAME="$1"
+  FILE_NAME="$2"
 
   # The line on which the function was called.
-  LINE_NUM="$2"
+  LINE_NUM="$3"
 
   # The message to print if the error was fatal.
-  MESSAGE="$3"
+  MESSAGE="$4"
 
   # Check if the previous call produced a non zero return code (an error).
-  if [ "$?" -ne "0" ]; then
+  if [ "${RET_CODE}" -ne "0" ]; then
     fatal_error "${FILE_NAME}" "${LINE_NUM}" "${MESSAGE}"
   fi
   
@@ -63,8 +67,10 @@ print_info()
   MESSAGE="$3"
 
   # Only print the message if the script is not told to be quiet.
-  if [ "${QUIET}" = "false" ]; then
-    echo "INFO | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&1
+  if [ "${DEBUG}" == "true" ]; then
+    echo "INFO  | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&1  
+  elif [ "${QUIET}" = "false" ]; then
+    echo "${MESSAGE}" >&1
   fi
 
   return 0
@@ -125,7 +131,7 @@ must_be_root()
   # Check if the current USER ID is 0 which indicates that the script is
   # executed as root.
   if [ "${EUID}" -ne "0" ]; then
-    fatal_error "${FILE_NAME}" "${LINENO}" \
+    fatal_error "${HELPERS_FILE_NAME}" "${LINENO}" \
       "The script must be executed as root."
   fi
 }
@@ -138,14 +144,14 @@ make_gpt()
   # The harddrive to create the partition table on.
   HDD=$1
 
-  print_info "${FILE_NAME}" "${LINENO}" \
+  print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
     "Creating GPT partition table on $1....."
 
   # Tell parted to create the partition table.
-  parted -s "${HDD}" mklabel gpt
+  MSG=$(parted -s "${HDD}" mklabel gpt 2>&1)
 
-  check_error "${FILE_NAME}" "${LINENO}" \
-     "Failed to create GPT partition table on $1."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+     "Failed to create GPT partition table on $1, because: \n\n${MSG}."
 }
 
 ################################################################################
@@ -184,52 +190,53 @@ make_part()
   # of installation and is not written to ROM at any point.
   PASSWD=$6
 
-  print_info "${FILE_NAME}" "${LINENO}" \
+  print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
     "Creating partition: ${NAME} on ${HDD}....."
 
   # Create the partition.
   parted -s -a optimal ${HDD} mkpart ${NAME} ${START} ${END}
 
-  check_error "${FILE_NAME}" "${LINENO}" "Failed to create partition."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+    "Failed to create partition."
 
   # Wait for the parition to become available.
-  wait_or_die "${FILE_NAME}" "${LINENO}" "/dev/disk/by-partlabel/${NAME}" 5
+  wait_or_die "${HELPERS_FILE_NAME}" "${LINENO}" "/dev/disk/by-partlabel/${NAME}" 5
 
   # Check what should be done with the partition.
   case "${TYPE}" in
     "efi")
-      print_info "${FILE_NAME}" "${LINENO}" \
+      print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Creating FAT32 filesystem for ${NAME}....."
 
-      mkfs.vfat -F 32 "/dev/disk/by-partlabel/${NAME}"
+      mkfs.vfat -F 32 "/dev/disk/by-partlabel/${NAME}" >/dev/null 2>&1
 
-      check_error "${FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
         "Failed to create fat32 file system."
       ;;
     "crypt")
-      print_info "${FILE_NAME}" "${LINEO}" "Encrypting ${NAME}....."
+      print_info "${HELPERS_FILE_NAME}" "${LINEO}" "Encrypting ${NAME}....."
 
       echo -n ${PASSWD} | cryptsetup --type luks1 -q luksFormat \
         "/dev/disk/by-partlabel/${NAME}" --key-file=-
 
-      check_error "${FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
         "Failed to create encrypted partition."
 
-      print_info "${FILE_NAME}" "${LINEO}" "Opening ${NAME}....."
+      print_info "${HELPERS_FILE_NAME}" "${LINEO}" "Opening ${NAME}....."
 
       echo -n ${PASSWD} | cryptsetup --type luks1 -q luksOpen \
         "/dev/disk/by-partlabel/${NAME}" ${NAME} --key-file=-
 
-      check_error "${FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
         "Failed to open encrypted partition."
       ;;
     *)
-      print_info "${FILE_NAME}" "${LINEO}" \
+      print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Creating ext4 filesystem for ${NAME}....."
 
-      mkfs.ext4 -q -F "/dev/disk/by-partlabel/${NAME}"
+      mkfs.ext4 -q -F "/dev/disk/by-partlabel/${NAME}" >/dev/null 2>&1
 
-      check_error "${FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Failed to create ext4 file system."
       ;;
   esac
@@ -242,13 +249,13 @@ make_pv()
 {
   HDD=$1
 
-  print_info "${FILE_NAME}" \
-    "${LINEO}" "Creating LVM physical volume on ${HDD}."
+  print_info "${HELPERS_FILE_NAME}" \
+    "${LINENO}" "Creating LVM physical volume on ${HDD}."
 
-  pvcreate -f -y -q ${HDD}
+  ERR=$(pvcreate -f -y -q ${HDD} 2>&1)
 
-  check_error "${FILE_NAME}" "${LINEO}" \
-    "Failed to create physical volume: ${HDD_NAME}."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+    "Failed to create physical volume: ${HDD_NAME}, because: \n\n${ERR}"
 }
 
 ################################################################################
@@ -260,13 +267,13 @@ make_vg()
   shift
   PV=("$@")
 
-  print_info "${FILE_NAME}" "${LINEO}" \
+  print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
     "Creating volume group \"${VG_NAME}\" on ${PV[@]}"
 
-  vgcreate -f -y -q ${VG_NAME} ${PV[@]}
+  ERR=$(vgcreate -f -y -q ${VG_NAME} ${PV[@]} 2>&1)
 
-  check_error "${FILE_NAME}" "${LINEO}" \
-    "Failed to create volume group: ${VG_NAME}."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+    "Failed to create volume group: ${VG_NAME}, because: \n\n${ERR}"
 }
 
 ################################################################################
@@ -279,36 +286,36 @@ make_lv()
   FS_TYPE=$3
   LV_SIZE=$4
 
-  print_info "${FILE_NAME}" "${LINEO}"\
+  print_info "${HELPERS_FILE_NAME}" "${LINENO}"\
     "Creating logical volume \"${LV_NAME}\" on \"${VG_NAME}\"....."
 
   if [[ "${LV_SIZE}" == *"%"* ]]; then
-    lvcreate -q -y -l ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
+    ERR=$(lvcreate -q -y -l ${LV_SIZE} -n ${LV_NAME} ${VG_NAME} 2>&1)
   else
-    lvcreate -q -y -L ${LV_SIZE} -n ${LV_NAME} ${VG_NAME}
+    ERR=$(lvcreate -q -y -L ${LV_SIZE} -n ${LV_NAME} ${VG_NAME} 2>&1)
   fi
 
-  check_error "${FILE_NAME}" "${LINEO}" \
-    "Failed to create logical volume: ${LV_NAME}."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+    "Failed to create logical volume: ${LV_NAME}, because:\n\n${ERR}"
 
   # Check the required file system.
   case "${FS_TYPE}" in
     "swap")
-      mkswap "/dev/${VG_NAME}/${LV_NAME}"
+      ERR=$(mkswap "/dev/${VG_NAME}/${LV_NAME}" 2>&1)
 
-      check_error "${FILE_NAME}" "${LINEO}" \
-        "Failed to create swap file system."
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+        "Failed to create swap file system, because:\n\n${ERR}"
 
-      swapon "/dev/${VG_NAME}/${LV_NAME}"
+      ERR=$(swapon "/dev/${VG_NAME}/${LV_NAME}" 2>&1)
 
-      check_error "${FILE_NAME}" "${LINEO}" \
-        "Failed to enable swap."
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+        "Failed to enable swap, because: \n\n${ERR}"
       ;;
     *)
-      mkfs.ext4 "/dev/${VG_NAME}/${LV_NAME}"
+      ERR=$(mkfs.ext4 "/dev/${VG_NAME}/${LV_NAME}" 2>&1)
 
-      check_error "${FILE_NAME}" "${LINEO}" \
-        "Failed to create ext4 file system."
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
+        "Failed to create ext4 file system, because:\n\n${ERR}"
       ;;
   esac
 }
@@ -324,5 +331,6 @@ mount_part()
   mkdir -p ${DST_PATH}
   mount ${SRC_PATH} ${DST_PATH}
 
-  check_error "${FILE_NAME}" "${LINEO}" "Failed to mount partition."
+  check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
+    "Failed to mount partition."
 }

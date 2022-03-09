@@ -58,15 +58,15 @@ prepare() {
 
   # Unmount anything on /mnt.
   umount -A --recursive /mnt >/dev/null 2>&1
-  check_error "${FILE_NAME}" ${LINENO} "Failed to unmount /mnt."
+  #check_error "$?" "${FILE_NAME}" ${LINENO} "Failed to unmount /mnt."
 
   # Get a list of all the volume groups.
   VGS=(`vgdisplay | grep "VG Name" | awk '{print $3}'`)
 
   # Delete all the logical volumes associated with each volume group.
   for vg in ${VGS[@]}; do
-    lvremove -q -f ${vg} #>/dev/null 2>&1
-    vgremove -q -f ${vg} #>/dev/null 2>&1
+    lvremove -q -f ${vg} >/dev/null 2>&1
+    vgremove -q -f ${vg} >/dev/null 2>&1
   done
 
   # Get a list of all the physical volumes.
@@ -74,7 +74,7 @@ prepare() {
 
   # Delete all the physical volumes.
   for pv in ${PVS[@]}; do 
-    pvremove -q -f ${pv} 
+    pvremove -q -f ${pv} >/dev/null 2>&1
   done
 }
 
@@ -122,15 +122,15 @@ prepare
 # Configure the hard-drive.
 case ${ENCRYPT} in
   "full")
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
+    . $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
     ;;
   
   "root")
-    $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
+    . $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
     ;;
 
   *)
-    $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
+    . $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
     ;;
 esac
 
@@ -140,7 +140,7 @@ nixos-generate-config --root /mnt --no-filesystems
 
 # Copy the configuration of the system.
 cp -f $(dirname "$0")/conf/configuration.nix "/mnt/etc/nixos/"
-check_error ${LINENO} "Failed to copy default configuration file."
+check_error "$?" "${FILE_NAME}" ${LINENO} "Failed to copy default configuration file."
 
 # Generate the desktop configuration.
 ${GEN_PATH}/gen_desktop.sh --type=${TYPE}
