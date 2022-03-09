@@ -16,13 +16,108 @@ For installation, networking is required. Only four steps are required:
 3. Run the installer: `sudo ./nixos-installer.sh [OPTIONS]`.
 4. Reboot.
 
+### Example 1 - No Encryption
+**Installation Command:**
+```
+$ sudo ./nixos-installer.sh \
+  --user=admin \
+  --password=admin \
+  --host-name=nixtest \
+  --encrypt=none \
+  --type=desktop \
+  --eth-dhcp=enp0s3 \
+  --vbox
+```
+**Installer Output:**
+```
+Creating GPT partition table on /dev/sda.....
+Creating partition: EFI on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/EFI to become available .....
+Creating FAT32 filesystem for EFI.....
+Creating partition: system-pv on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/system-pv to become available .....
+Creating ext4 filesystem for system-pv.....
+Creating LVM physical volume on /dev/disk/by-partlabel/system-pv.
+Creating volume group "system-vg" on /dev/disk/by-partlabel/system-pv
+Creating logical volume "swap-lv" on "system-vg".....
+Creating logical volume "root-lv" on "system-vg".....
+Installing NixOS.....
+Done! Enjoy NixOS!
+```
+
+### Example 2 - Root Encryption
+**Installation Command:**
+```
+$ sudo ./nixos-installer.sh \
+  --user=admin \
+  --password=admin \
+  --host-name=nixtest \
+  --encrypt=root \
+  --key=admin \
+  --type=desktop \
+  --eth-dhcp=enp0s3 \
+  --vbox
+```
+**Installer Output:**
+```
+Creating GPT partition table on /dev/sda.....
+Creating partition: EFI on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/EFI to become available .....
+Creating FAT32 filesystem for EFI.....
+Creating partition: boot on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/boot to become available .....
+Creating ext4 filesystem for boot.....
+Creating partition: system-crypt on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/system-crypt to become available .....
+Encrypting system-crypt.....
+Opening system-crypt.....
+Creating LVM physical volume on /dev/mapper/system-crypt.
+Creating volume group "system-vg" on /dev/mapper/system-crypt
+Creating logical volume "swap-lv" on "system-vg".....
+Creating logical volume "root-lv" on "system-vg".....
+Installing NixOS.....
+Done! Enjoy NixOS!
+```
+
+### Example 3 - Full Encryption
+**Installation Command:**
+```
+$ sudo ./nixos-installer.sh \
+  --user=admin \
+  --password=admin \
+  --host-name=nixtest \
+  --encrypt=full \
+  --key=admin \
+  --type=desktop \
+  --eth-dhcp=enp0s3 \
+  --vbox
+```
+**Installer Output:**
+```
+Device No is not active.
+Creating GPT partition table on /dev/sda.....
+Creating partition: EFI on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/EFI to become available .....
+Creating FAT32 filesystem for EFI.....
+Creating partition: system-crypt on /dev/sda.....
+Waiting for device /dev/disk/by-partlabel/system-crypt to become available .....
+Encrypting system-crypt.....
+Opening system-crypt.....
+Creating LVM physical volume on /dev/mapper/system-crypt.
+Creating volume group "system-vg" on /dev/mapper/system-crypt
+Creating logical volume "swap-lv" on "system-vg".....
+Creating logical volume "root-lv" on "system-vg".....
+Installing NixOS.....
+Done! Enjoy NixOS!
+```
+
+
 If everything went well, NixOS will now be installed. 
 ## HOWTO - VirtualBox Installation
 The installer is tested on *VirtualBox 6.1.32* with matching *Oracle VM
 VirtualBox Extension Pack 6.1.32* installed. The test VM has the configuration
 below and suits the purpose of a typical software development VM. The options in
-bold red are very important. The settings in orange are important for a good
-graphical experience.
+***bold-italics*** are important to get right.
 
 Virtual Machine
 * **Name:** nixtest
@@ -36,13 +131,13 @@ Virtual Hard Disk
 * **Storage  on physical hard disk:** Fixed Size
 
 System
-* <span style="color:red">**Enable EFI (special OSes only):**</span> Checked
+* ***Enable EFI (special OSes only):*** Checked
 * **Processors:** 4
 
 Display
-* <span style="color:orange">**Video Memory:**</span> 128 MB
+* ***Video Memory:*** 128 MB
 * **Graphics Controller:** VMSVGA (default)
-* <span style="color:orange">**Enable 3D Acceleration:**</span> Checked
+* ***Enable 3D Acceleration:*** Checked
 
 Everything else has been left as default. NixOS is pretty space consuming,
 however if you are running garbage collection frequently, feel free to reduce
