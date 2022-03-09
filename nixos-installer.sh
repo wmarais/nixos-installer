@@ -33,6 +33,8 @@ X11_GUEST="false"
 # Path to the generators.
 GEN_PATH=$(dirname "$0")/conf
 
+FILE_NAME="${0##*/}"
+
 ################################################################################
 # Check whether the combination of arguments look sensible.
 ################################################################################
@@ -42,6 +44,38 @@ validate_args() {
       ehco "An ecryption key must be specified using -k or --key."
     fi
   fi
+}
+
+################################################################################
+# Prepare for installation. This has to perform three actions:
+#  1. Disable all swap.
+#  2. Umount everything on /mnt.
+#  3. Remove all LVM volume groups.
+################################################################################
+prepare() {
+  # Disable all swap.
+  swapoff --all
+
+  # Unmount anything on /mnt.
+  umount -A --recursive /mnt >/dev/null 2>&1
+  check_error "${FILE_NAME}" ${LINENO} "Failed to unmount /mnt."
+
+  # Get a list of all the volume groups.
+  VGS=(`vgdisplay | grep "VG Name" | awk '{print $3}'`)
+
+  # Delete all the logical volumes associated with each volume group.
+  for vg in ${VGS[@]}; do
+    lvremove -q -f ${vg} #>/dev/null 2>&1
+    vgremove -q -f ${vg} #>/dev/null 2>&1
+  done
+
+  # Get a list of all the physical volumes.
+  PVS=(`pvdisplay | grep "PV Name" | awk '{print $3}'`)
+
+  # Delete all the physical volumes.
+  for pv in ${PVS[@]}; do 
+    pvremove -q -f ${pv} 
+  done
 }
 
 ################################################################################
@@ -81,6 +115,9 @@ must_be_root ${LINENO}
 
 # Check that the script args are valid.
 validate_args
+
+# Prepare the host for installation / reinstallation.
+prepare
 
 # Configure the hard-drive.
 case ${ENCRYPT} in
