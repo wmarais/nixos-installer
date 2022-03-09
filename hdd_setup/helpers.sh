@@ -210,24 +210,24 @@ make_part()
 
       mkfs.vfat -F 32 "/dev/disk/by-partlabel/${NAME}" >/dev/null 2>&1
 
-      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Failed to create fat32 file system."
       ;;
     "crypt")
-      print_info "${HELPERS_FILE_NAME}" "${LINEO}" "Encrypting ${NAME}....."
+      print_info "${HELPERS_FILE_NAME}" "${LINENO}" "Encrypting ${NAME}....."
 
       echo -n ${PASSWD} | cryptsetup --type luks1 -q luksFormat \
         "/dev/disk/by-partlabel/${NAME}" --key-file=-
 
-      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Failed to create encrypted partition."
 
-      print_info "${HELPERS_FILE_NAME}" "${LINEO}" "Opening ${NAME}....."
+      print_info "${HELPERS_FILE_NAME}" "${LINENO}" "Opening ${NAME}....."
 
       echo -n ${PASSWD} | cryptsetup --type luks1 -q luksOpen \
         "/dev/disk/by-partlabel/${NAME}" ${NAME} --key-file=-
 
-      check_error "$?" "${HELPERS_FILE_NAME}" "${LINEO}" \
+      check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
         "Failed to open encrypted partition."
       ;;
     *)

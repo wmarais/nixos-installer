@@ -76,6 +76,12 @@ prepare() {
   for pv in ${PVS[@]}; do 
     pvremove -q -f ${pv} >/dev/null 2>&1
   done
+
+  # Get a list of all the open encrypted volumes.
+  EVS=(`dmsetup ls --target crypt | awk '{print $1}'`)
+  for ev in ${EVS[@]}; do
+    cryptsetup luksClose ${ev}
+  done
 }
 
 ################################################################################
@@ -136,7 +142,9 @@ esac
 
 # Generate the hardware configuration without the filesystems section since this
 # is done automatically by the hdd_setup scripts.
-nixos-generate-config --root /mnt --no-filesystems
+ERR=$(nixos-generate-config --root /mnt --no-filesystems 2>&1)
+check_error "$?" "${FILE_NAME}" ${LINENO} \
+  "Failed to generate NixOS config because:\n\n${ERR}"
 
 # Copy the configuration of the system.
 cp -f $(dirname "$0")/conf/configuration.nix "/mnt/etc/nixos/"
@@ -165,6 +173,11 @@ ${GEN_PATH}/gen_guest.sh --vbox=${VBOX_GUEST} --vmware=${VMWARE_GUEST} \
   --x11=${X11_GUEST}
 
 # Rebuild the distribution.
-nixos-install --no-root-passwd
+print_info "${FILE_NAME}" "${LINENO}" "Installing NixOS....."
+ERR=$(nixos-install --no-root-passwd >/dev/null 2>&1)
+check_error "$?" "${FILE_NAME}" "${LINENO}" \
+  "Failed to install NixOS because:\n\n${ERR}"
+
+print_info "${FILE_NAME}" "${LINENO}" "Done! Enjoy NixOS!"
 
 exit 0
