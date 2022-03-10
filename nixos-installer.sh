@@ -128,15 +128,21 @@ prepare
 # Configure the hard-drive.
 case ${ENCRYPT} in
   "full")
-    . $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
+    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
+    check_error "$?" "${FILE_NAME}" "${LINENO}" \
+      "Installation failed."
     ;;
   
   "root")
-    . $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
+    $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
+    check_error "$?" "${FILE_NAME}" "${LINENO}" \
+      "Installation failed."
     ;;
 
   *)
-    . $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
+    $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
+    check_error "$?" "${FILE_NAME}" "${LINENO}" \
+      "Installation failed."
     ;;
 esac
 

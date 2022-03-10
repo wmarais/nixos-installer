@@ -32,7 +32,7 @@ ROOT_LV_SIZE="100%FREE"
 ROOT_LV_FS="ext4"
 
 # Include the common helper functions.
-. $(dirname "$0")/hdd_setup/helpers.sh
+. $(dirname "$0")/helpers.sh
 
 # Make sure the script is executed as root.
 must_be_root ${LINENO}
@@ -63,6 +63,7 @@ mount_part "/dev/${VG_NAME}/${ROOT_LV_NAME}" "/mnt"
 mount_part "/dev/disk/by-partlabel/${EFI_PART_NAME}" "/mnt/boot/efi"
 
 # Write the filesystem configuration. This includes the grub configuration.
-$(dirname "$0")/hdd_setup/gen_fs_conf.sh "encrypt_full" ${EFI_PART_NAME} \
+$(dirname "$0")/gen_fs_conf.sh "encrypt_full" ${EFI_PART_NAME} \
   ${SYS_PART_NAME} ${VG_NAME} ${SWAP_LV_NAME} ${ROOT_LV_NAME}
 
+exit 0

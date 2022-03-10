@@ -22,17 +22,20 @@ done
 STR_USERS="\
 { config, pkgs, ... }:
 {
-  users.users = {
-    # Disable root logins.
-    root = {
-      hashedPassword = \"!\";
-    };
+  users = {
+    mutableUsers = true;
+    users = {
+      # Disable root logins.
+      root = {
+        hashedPassword = \"!\";
+      };
 
-    # Create a the default user with sudo access.
-    ${USER} = {
-      isNormalUser = true;
-      extraGroups = [ \"wheel\" ];
-      hashedPassword = \"$(mkpasswd -m sha-512 ${PASSWORD})\";
+      # Create a the default user with sudo access.
+      ${USER} = {
+        isNormalUser = true;
+        extraGroups = [ \"wheel\" ];
+        initialHashedPassword = \"$(mkpasswd -m sha-512 ${PASSWORD})\";
+      };
     };
   };
 }"
