@@ -8,7 +8,7 @@ SWAP_LV_NAME=$5
 ROOT_LV_NAME=$6
 
 # The path where the fs configuration will be written too.
-FS_CONF_PATH="/mnt/etc/nixos/conf"
+FS_CONF_PATH="/mnt/etc/nixos/host"
 
 ################################################################################
 # The hardrive configuration used for no disk encryption.

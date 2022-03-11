@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The configuration file that will be generated.
-CONF_FILE="/mnt/etc/nixos/conf/guest.nix"
+CONF_FILE="/mnt/etc/nixos/host/vm_guest.nix"
 
 # Whether the it is a virtual box guest or not.
 VBOX_GUEST="false"

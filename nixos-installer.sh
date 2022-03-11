@@ -31,7 +31,7 @@ X11_GUEST="false"
 . $(dirname "$0")/hdd_setup/helpers.sh
 
 # Path to the generators.
-GEN_PATH=$(dirname "$0")/conf
+GEN_PATH=$(dirname "$0")/generators
 
 FILE_NAME="${0##*/}"
 
@@ -153,8 +153,12 @@ check_error "$?" "${FILE_NAME}" ${LINENO} \
   "Failed to generate NixOS config because:\n\n${ERR}"
 
 # Copy the configuration of the system.
-cp -f $(dirname "$0")/conf/configuration.nix "/mnt/etc/nixos/"
+cp -r -f $(dirname "$0")/configuration/* "/mnt/etc/nixos/"
 check_error "$?" "${FILE_NAME}" ${LINENO} "Failed to copy default configuration file."
+
+mkdir -p /mnt/etc/nixos/host
+mkdir -p /mnt/etc/nixos/security
+mkdir -p /mnt/etc/nixos/applications
 
 # Generate the desktop configuration.
 ${GEN_PATH}/gen_desktop.sh --type=${TYPE}
@@ -175,12 +179,12 @@ ${GEN_PATH}/gen_maintenance.sh --auto-gc=${AUTO_GC} --auto-dedup=${AUTO_DEDUP} \
 if [ ${TYPE} == "desktop" ]; then
   X11_GUEST="true"
 fi
-${GEN_PATH}/gen_guest.sh --vbox=${VBOX_GUEST} --vmware=${VMWARE_GUEST} \
+${GEN_PATH}/gen_vm_guest.sh --vbox=${VBOX_GUEST} --vmware=${VMWARE_GUEST} \
   --x11=${X11_GUEST}
 
 # Rebuild the distribution.
 print_info "${FILE_NAME}" "${LINENO}" "Installing NixOS....."
-ERR=$(nixos-install --no-root-passwd >/dev/null 2>&1)
+ERR=$(nixos-install --no-root-passwd 2>&1)
 check_error "$?" "${FILE_NAME}" "${LINENO}" \
   "Failed to install NixOS because:\n\n${ERR}"
 

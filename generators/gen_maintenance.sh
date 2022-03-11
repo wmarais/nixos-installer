@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The configuration file that will be generated.
-CONF_FILE="/mnt/etc/nixos/conf/maintenance.nix"
+CONF_FILE="/mnt/etc/nixos/host/maintenance.nix"
 
 # Automatic Garbage Collection.
 AUTO_GC="false"

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The configuration file that will be generated.
-CONF_FILE="/mnt/etc/nixos/conf/users.nix"
+CONF_FILE="/mnt/etc/nixos/security/users.nix"
 
 # The user account that will be created.
 USER=""

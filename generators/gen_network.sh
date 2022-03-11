@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The configuration file that will be generated.
-CONF_FILE="/mnt/etc/nixos/conf/network.nix"
+CONF_FILE="/mnt/etc/nixos/host/network.nix"
 
 # The interface to enable DHCP on.
 ETH_DHCP=""

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The configuration file that will be generated.
-CONF_FILE="/mnt/etc/nixos/conf/desktop.nix"
+CONF_FILE="/mnt/etc/nixos/host/desktop.nix"
 
 # The type of desktop to deploy.
 TYPE=""
