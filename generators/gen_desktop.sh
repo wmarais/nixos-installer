@@ -29,6 +29,11 @@ STR_DESKTOP="\
     xfce.xfce4-icon-theme
   ];
 
+  # Enable the network manager for used in the desktop.
+  networking.networkmanager = {
+    enable = true;
+  };
+
   # Enable hardware acceleration.
   hardware.opengl.enable = true;
 
@@ -50,6 +55,22 @@ STR_DESKTOP="\
       desktopManager = {
         xfce.enable = true;
       };
+
+      # Let the screen lock automatically after a few minutes of inactivity.
+      xautolock = {
+        enable = true;
+        time = 5;
+      };
+    };
+    
+    # This adds some nice graphical effects. This is not critical for desktop
+    # so if it is slow, disable it.
+    picom = {
+      enable = false;
+      fade = true;
+      inactiveOpacity = 0.9;
+      shadow = true;
+      fadeDelta = 4;
     };
   };
 }"

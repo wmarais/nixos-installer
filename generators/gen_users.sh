@@ -33,7 +33,7 @@ STR_USERS="\
       # Create a the default user with sudo access.
       ${USER} = {
         isNormalUser = true;
-        extraGroups = [ \"wheel\" ];
+        extraGroups = [ \"wheel\"  \"networkmanager\"  \"libvirtd\" ];
         initialHashedPassword = \"$(mkpasswd -m sha-512 ${PASSWORD})\";
       };
     };

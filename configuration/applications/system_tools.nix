@@ -6,5 +6,6 @@
     htop
     curl
     git
+    qemu_kvm
   ];
 }
