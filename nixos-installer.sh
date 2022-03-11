@@ -188,6 +188,12 @@ ERR=$(nixos-install --no-root-passwd 2>&1)
 check_error "$?" "${FILE_NAME}" "${LINENO}" \
   "Failed to install NixOS because:\n\n${ERR}"
 
+# If deploying a desktop, manually copy the /etc/skel files for the created
+# user account.
+if [ "${TYPE}" == "desktop" ]; then
+  cp -r ./generators/skel/.config "/mnt/home/${USER}"
+fi
+
 print_info "${FILE_NAME}" "${LINENO}" "Done! Enjoy NixOS!"
 
 exit 0
