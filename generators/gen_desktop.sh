@@ -19,7 +19,7 @@ STR_DESKTOP="\
 {config, pkgs, ...}:
 {
   environment.etc = {
-    skel.source = ./skel;
+    skel.source = ../skel;
   };
 
   # The required packages for XFCE.
