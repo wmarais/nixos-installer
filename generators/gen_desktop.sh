@@ -18,10 +18,6 @@ done
 STR_DESKTOP="\
 {config, pkgs, ...}:
 {
-  environment.etc = {
-    skel.source = ../skel;
-  };
-
   # The required packages for XFCE.
   environment.systemPackages = with pkgs; [
     brave
@@ -62,6 +58,9 @@ STR_DESKTOP_EMPTY="\
 { config, pkgs, ... }:
 {
 }"
+
+mkdir -p /mnt/etc/skel
+cp -r ./generators/skel/ /mnt/etc/
 
 if [ "${TYPE}" == "desktop" ]; then
   echo "${STR_DESKTOP}" > ${CONF_FILE}
