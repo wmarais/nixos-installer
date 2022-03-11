@@ -18,8 +18,13 @@ done
 STR_DESKTOP="\
 {config, pkgs, ...}:
 {
+  environment.etc = {
+    skel.source = ./skel;
+  };
+
   # The required packages for XFCE.
   environment.systemPackages = with pkgs; [
+    brave
     lightdm
     lightlocker
     xfce.thunar-archive-plugin
