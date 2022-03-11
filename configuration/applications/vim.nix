@@ -5,7 +5,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    vim
     (vim_configurable.customize
     {
       name = "vim";
