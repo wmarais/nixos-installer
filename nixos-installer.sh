@@ -192,6 +192,8 @@ check_error "$?" "${FILE_NAME}" "${LINENO}" \
 # user account.
 if [ "${TYPE}" == "desktop" ]; then
   cp -r ./generators/skel/.config "/mnt/home/${USER}"
+  chown -R nixos:users /mnt/home/${USER}/.config
+  chmod -R 700 /mnt/home/${USER}/.config
 fi
 
 print_info "${FILE_NAME}" "${LINENO}" "Done! Enjoy NixOS!"
