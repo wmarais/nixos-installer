@@ -55,12 +55,6 @@ STR_DESKTOP="\
       desktopManager = {
         xfce.enable = true;
       };
-
-      # Let the screen lock automatically after a few minutes of inactivity.
-      xautolock = {
-        enable = true;
-        time = 5;
-      };
     };
     
     # This adds some nice graphical effects. This is not critical for desktop
