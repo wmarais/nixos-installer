@@ -27,6 +27,10 @@ STR_DESKTOP="\
     xfce.thunar-volman
     xfce.tumbler
     xfce.xfce4-icon-theme
+    moka-icon-theme
+    xfce.xfce4-taskmanager
+    xfce.xfce4-pulseaudio-plugin
+    xfce.xfce4-whiskermenu-plugin
   ];
 
   # Enable the network manager for used in the desktop.
@@ -36,6 +40,9 @@ STR_DESKTOP="\
 
   # Enable hardware acceleration.
   hardware.opengl.enable = true;
+  hardware.pulseaudio.enable = true;
+  hardware.pulseaudio.support32Bit = true;
+  hardware.pulseaudio.package = pkgs.pulseaudioFull;
 
   # Configure the services required for a desktop.
   services = {
@@ -54,6 +61,7 @@ STR_DESKTOP="\
       # Enable XCE as an available Desktop Manager.
       desktopManager = {
         xfce.enable = true;
+        xfce.thunarPlugins = [ pkgs.xfce.thunar-archive-plugin ];
       };
     };
     
