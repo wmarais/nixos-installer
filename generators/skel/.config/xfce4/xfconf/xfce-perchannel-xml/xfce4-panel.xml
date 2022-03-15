@@ -51,6 +51,13 @@
         <value type="int" value="21"/>
         <value type="int" value="22"/>
       </property>
+      <property name="background-style" type="uint" value="0"/>
+      <property name="background-rgba" type="array">
+        <value type="double" value="0.000000"/>
+        <value type="double" value="0.000000"/>
+        <value type="double" value="0.000000"/>
+        <value type="double" value="1.000000"/>
+      </property>
     </property>
   </property>
   <property name="plugins" type="empty">
@@ -76,6 +83,9 @@
       <property name="square-icons" type="bool" value="true"/>
       <property name="known-legacy-items" type="array">
         <value type="string" value="networkmanager applet"/>
+      </property>
+      <property name="known-items" type="array">
+        <value type="string" value="vlc"/>
       </property>
     </property>
     <property name="plugin-9" type="string" value="power-manager-plugin"/>
@@ -123,6 +133,7 @@
     <property name="plugin-23" type="string" value="whiskermenu"/>
     <property name="plugin-24" type="string" value="pulseaudio">
       <property name="enable-keyboard-shortcuts" type="bool" value="true"/>
+      <property name="mpris-players" type="string" value="vlc"/>
     </property>
   </property>
 </channel>

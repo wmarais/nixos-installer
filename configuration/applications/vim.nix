@@ -18,6 +18,7 @@
           vim-lastplace
           YouCompleteMe
           fugitive
+          vim-markdown
         ];
         opt = [];
       };
