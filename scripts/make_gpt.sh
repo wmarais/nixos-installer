@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # The storage medium on which the GPT partition table will be created.
-STORAGE_DEVICE=""
+DEVICE=""
 
 # Load the helper function library.
 . $(dirname "$0")/func_lib.sh
@@ -19,11 +19,11 @@ NAME:
 USAGE:
 
   ./make_gpt.sh \\
-    --storage_dev=<path to storage device>
+    --device=<path to storage device>
 
 OPTIONS:
 
-  --storage-device  The storage device on which the GPT partition table will be
+  --device          The storage device on which the GPT partition table will be
                     created.
 
   --help            Print the help string for the script and exit execution
@@ -48,8 +48,8 @@ print_help() {
 validate_args()
 {
   # Check if the specified HDD exists.
-  device_exists "${STORAGE_DEVICE}"
-  check_error "${LINENO}" "No such device: ${STORAGE_DEVICE}"
+  device_exists "${DEVICE}"
+  check_error "${LINENO}" "No such device: ${DEVICE}"
 }
 ################################################################################
 # EXEC START
@@ -57,23 +57,23 @@ validate_args()
 # Parse the arguments to the script.
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --storage-device=*) STORAGE_DEVICE="${1#*=}"; shift 1;;
+    --device=*)         DEVICE="${1#*=}"; shift 1;;
     --help)             print_help;;
-    *) echo "invalid argument: $1, see: ${SCRIPT_NAME} --help." >&2; exit 1;;
+    *) echo "Invalid argument: $1, see: ${SCRIPT_NAME} --help." >&2; exit 1;;
   esac
 done
 
 # Make sure the script is executed as root.
-must_be_root
+must_be_root ${LINENO}
 
 # Validate the supplied arguments.
 validate_args 
 
 print_info "${LINENO}" "Creating GPT partition table on $1....."
 
-ERR_MSG=$(parted -s "${HDD}" mklabel gpt 2>&1)
+ERR_MSG=$(parted -s "${DEVICE}" mklabel gpt 2>&1)
 
 check_error "${LINENO}" \
-   "Failed to create GPT partition table on $1, because: \n\n${MSG}.\n\n"
+  "Failed to create GPT partition table on $1, because: \n\n${ERR_MSG}.\n\n"
 
 exit 0
