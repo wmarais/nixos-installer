@@ -18,6 +18,23 @@
 SCRIPT_NAME=$(basename "$0")
 
 ################################################################################
+# Check if the specified device (/dev/...) exists.
+################################################################################
+device_exists()
+{
+  # Get the name of the file.
+  local DEV_PATH="$1"
+
+  # Check if the device file is missing.
+  if [ "${DEV_PATH}" == "" ] || [ ! -e "${DEV_PATH}" ]; then
+    return 1
+  fi
+
+  # The file exists.
+  return 0
+}
+
+################################################################################
 # Print a fatal error message.
 ################################################################################
 fatal_error() 
@@ -40,17 +57,18 @@ fatal_error()
 ################################################################################
 check_error() 
 {
-  # The value returned by the command.
-  local RET_CODE="$1"
+  # The return code of the preceeding call. Must be saved before doing anything
+  # else that will overwrite it.
+  RET_CODE="$?"
 
   # The line on which the function was called.
-  local LINE_NUM="$2"
+  local LINE_NUM="$1"
 
   # The message to print if the error was fatal.
-  local MESSAGE="$3"
+  local MESSAGE="$2"
 
   # Check if the previous call produced a non zero return code (an error).
-  if [ "${RET_CODE}" -ne "0" ]; then
+  if [ "${RET_CODE}" != "0" ]; then
     fatal_error "${LINE_NUM}" "${MESSAGE}"
   fi
  
@@ -103,8 +121,8 @@ wait_or_die()
   # The line number on which the call was made.
   local LINE_NUM=$1
 
-  # The file to wait on.
-  local FILE_PATH=$2
+  # The device to wait on.
+  local DEVICE=$2
 
   # The number of seconds / retries to wait for.
   local MAX_RETRIES=$3
@@ -114,10 +132,10 @@ wait_or_die()
   
   # Keep waiting for the file to become available until the timeout period
   # expires.
-  while [[ ! -f "${FILE_PATH}" && ! -L "${FILE_PATH}" ]]; do
+  while [ ! -e "${DEVICE}" ]; do
 
     print_info "${LINENO}" \
-      "Waiting for device ${FILE_PATH} to become available ....."
+      "Waiting for device ${DEVICE} to become available ....."
 
     # Sleep for a second before trying again.
     sleep 1

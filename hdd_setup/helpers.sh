@@ -7,24 +7,6 @@ QUIET=false
 DEBUG=false
 
 ################################################################################
-# Create a GPT partition table on the specified HDD.
-################################################################################
-make_gpt()
-{
-  # The harddrive to create the partition table on.
-  HDD=$1
-
-  print_info "${HELPERS_FILE_NAME}" "${LINENO}" \
-    "Creating GPT partition table on $1....."
-
-  # Tell parted to create the partition table.
-  MSG=$(parted -s "${HDD}" mklabel gpt 2>&1)
-
-  check_error "$?" "${HELPERS_FILE_NAME}" "${LINENO}" \
-     "Failed to create GPT partition table on $1, because: \n\n${MSG}."
-}
-
-################################################################################
 #
 ################################################################################
 make_part()
