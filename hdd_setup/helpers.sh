@@ -7,19 +7,6 @@ QUIET=false
 DEBUG=false
 
 ################################################################################
-# Check whether the script is execute as root. If not exit.
-################################################################################
-must_be_root()
-{
-  # Check if the current USER ID is 0 which indicates that the script is
-  # executed as root.
-  if [ "${EUID}" -ne "0" ]; then
-    fatal_error "${HELPERS_FILE_NAME}" "${LINENO}" \
-      "The script must be executed as root."
-  fi
-}
-
-################################################################################
 # Create a GPT partition table on the specified HDD.
 ################################################################################
 make_gpt()
@@ -45,7 +32,7 @@ make_part()
   # The HDD that the partition will be created on.
   HDD=$1
 
-  # The name of the partition. This will make the disk appear in  
+  # The name of the partition. This will make the disk appear in
   # /dev/disk/by-label/${NAME} which makes it easier to reference when the
   # partition layout changes. (I.e. no dependency on exact partition numbers.)
   NAME=$2

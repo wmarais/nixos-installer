@@ -4,7 +4,7 @@
 # errors after function calls etc. To use it, include it into your script using
 # the following command:
 #
-#  . $(dirname "$0")/scripts/common_funcs.sh
+#  . $(dirname "$0")/scripts/func_lib.sh
 #
 # NOTE:
 #   1. This assumes your script is located one level up from this scripts 
@@ -14,21 +14,22 @@
 #      functions will not terminate the script upon error etc.
 #
 ################################################################################
+# The name of the script that these functions are called from within.
+SCRIPT_NAME=$(basename "$0")
+
+################################################################################
 # Print a fatal error message.
 ################################################################################
 fatal_error() 
 {
-  # The file in which the error occurred.
-  local FILE_NAME="$1"
-
   # The line on which the check was performed.
-  local LINE_NUM="$2"
+  local LINE_NUM="$1"
 
   # The message associated with the error.
-  local MESSAGE="$3"
+  local MESSAGE="$2"
 
   # Print the error message to cerr.
-  echo -e "FATAL | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&2
+  echo -e "FATAL | ${SCRIPT_NAME} | ${LINE_NUM} | ${MESSAGE}" >&2
 
   # Exit out of the script.
   exit 1
@@ -42,18 +43,15 @@ check_error()
   # The value returned by the command.
   local RET_CODE="$1"
 
-  # The file in which the function is called.
-  local FILE_NAME="$2"
-
   # The line on which the function was called.
-  local LINE_NUM="$3"
+  local LINE_NUM="$2"
 
   # The message to print if the error was fatal.
-  local MESSAGE="$4"
+  local MESSAGE="$3"
 
   # Check if the previous call produced a non zero return code (an error).
   if [ "${RET_CODE}" -ne "0" ]; then
-    fatal_error "${FILE_NAME}" "${LINE_NUM}" "${MESSAGE}"
+    fatal_error "${LINE_NUM}" "${MESSAGE}"
   fi
  
   # No error occurred. 
@@ -61,27 +59,39 @@ check_error()
 }
 
 ################################################################################
+# Check whether the script is execute as root. If not exit.
+################################################################################
+must_be_root()
+{
+  # The line on which the check is performed.
+  local LINE_NUM="$1"
+
+  # Check if the current USER ID is 0 which indicates that the script is
+  # executed as root.
+  if [ "${EUID}" -ne "0" ]; then
+    fatal_error "${LINENO}" "The script must be executed as root."
+  fi
+}
+
+################################################################################
 # Print and information message to cout.
 ################################################################################
 print_info()
 {
-  # The file in which the function is called.
-  local FILE_NAME="$1"
-
   # The line on which the function was called.
-  local LINE_NUM="$2"
+  local LINE_NUM="$1"
 
   # The message to print if the error was fatal.
-  local MESSAGE="$3"
+  local MESSAGE="$2"
 
   # Only print the message if the script is not told to be quiet.
   if [ "${DEBUG}" == "true" ]; then
-    echo "INFO  | ${FILE_NAME} | ${LINE_NUM} | ${MESSAGE}" >&1  
+    echo "INFO  | ${SCRIPT_NAME} | ${LINE_NUM} | ${MESSAGE}" >&1  
   elif [ "${QUIET}" = "false" ]; then
     echo "${MESSAGE}" >&1
   fi
 
-  # No error occured.
+  # No error occurred.
   return 0
 }
 
@@ -90,17 +100,14 @@ print_info()
 ################################################################################
 wait_or_die()
 {
-  # The file where the function is called from.
-  local FILE_NAME=$1
-
   # The line number on which the call was made.
-  local LINE_NUM=$2
+  local LINE_NUM=$1
 
   # The file to wait on.
-  local FILE_PATH=$3
+  local FILE_PATH=$2
 
   # The number of seconds / retries to wait for.
-  local MAX_RETRIES=$4
+  local MAX_RETRIES=$3
 
   # The current number of retries.
   local TRY_COUNT=0
@@ -109,7 +116,7 @@ wait_or_die()
   # expires.
   while [[ ! -f "${FILE_PATH}" && ! -L "${FILE_PATH}" ]]; do
 
-    print_info "${FILE_NAME}" "${LINENO}" \
+    print_info "${LINENO}" \
       "Waiting for device ${FILE_PATH} to become available ....."
 
     # Sleep for a second before trying again.
@@ -144,7 +151,7 @@ validate_user_or_group_name() {
   local TEMP_USER=$(echo "${USER}" | sed -rn '^[a-z][-a-z0-9]*$')
   local USER_LEN=${#TEMP_USER}
 
-  [[ "${USER_LEN}" > "0" && "${USER_LEN}" <= "32" ]]
+  [ ${USER_LEN} -gt 0 ] && [ ${USER_LEN} -le 32 ]
 }
 
 ################################################################################
