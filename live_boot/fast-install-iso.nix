@@ -25,5 +25,8 @@
     cryptsetup
     openssh
     zfs
+    git
   ];
-}    
+
+  users.users.nixos.initialPassword = "nixos";
+}
