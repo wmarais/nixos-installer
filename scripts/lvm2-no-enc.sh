@@ -33,21 +33,45 @@ ROOT_LV_FS="ext4"
 # The name of this file which is used for debug printing.
 ENC_NONE_FILE_NAME="hdd_setup/encrypt_none.sh"
 
+
+# The path to the scripts.
+SCRIPTS_DIR=$(dirname "$0")
+
+
+EFI_SIZE=""
+BOOT_SIZE=""
+SWAP_SIZE=""
+ROOT_SIZE=""
+NIX_SIZE=""
+
+
+# Calculate the boundary of the EFI Partition.
+EFI_START="1MiB"
+EFI_END=$(expr $(to_mib ${EFI_START}) + $(to_mib ${EFI_SIZE}))
+
+# Calculate the boundary of the BOOT partition.
+
+
+
+
 # Include the common helper functions.
-. $(dirname "$0")/helpers.sh
+. ${SCRIPTS_DIR}/func_lib.sh
 
 # Make sure the script is executed as root.
 must_be_root ${LINENO}
 
 # Create a new GPT partition table on the specified HDD.
-make_gpt ${HDD}
+${SCRIPTS_DIR}/make_gpt.sh --device=${HDD}
+check_error ${LINENO} "HDD setup failed."
 
 # Create the EFI partition.
-make_part ${HDD} ${EFI_PART_NAME} ${EFI_PART_TYPE} ${EFI_PART_START} \
-  ${EFI_PART_END}
+${SCRIPTS_DIR}/make_part.sh --device=${HDD} --name=${EFI_PART_NAME} \
+  --type=${EFI_PART_TYPE} --start=${EFI_PART_START} \
+  --end=${EFI_PART_END}
+check_error ${LINENO} "HDD setup failed."
 
 # Create the partition that will be used of the LVM physical volume.
-make_part ${HDD} ${PV_PART_NAME} ${PV_PART_TYPE} ${PV_PART_START} \
+${SCRIPTS_DIR}/make_part.sh ${HDD} ${PV_PART_NAME} ${PV_PART_TYPE} ${PV_PART_START} \
   ${PV_PART_END}
 
 # Create the LVM physical volume.

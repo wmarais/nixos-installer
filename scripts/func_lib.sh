@@ -216,6 +216,78 @@ validate_groups() {
 }
 
 ################################################################################
+# Converts an input valid to a MiB value. It does not append the MiB string
+# suffix so that the output value can be used in an expr.
+################################################################################
+to_mib() {
+  # The maximum size of the volume.
+  local MAX_SIZE=$(to_mib "$2" "0" "0")
+
+  # The remaining size of the volume (empty space).
+  local REMAINING_SIZE=$(to_mib "$3" "0" "0")
+
+  # Check if the value is specified in MiB
+  local VALUE=$(echo "$1" | sed -n "/s/MiB$//p")
+
+  if [ "${VALUE}" != "" ]; then
+    echo "${VALUE}" >&1
+    return "$?"
+  fi
+
+  # Check if the value is specified in GiB.
+  VALUE=$(echo "$1" | sed -n "/s/GiB$//p")
+  
+  if [ "${VALUE}" != "" ]; then 
+    echo "$(expr ${VALUE} * 1024)" >&1
+    return "$?"
+  fi
+  
+  # Check if the value specified in %.
+  VALUE=$(echo "$1" | sed -n "/s/%$//p")
+  if [ "${VALUE}" != "" ]; then
+    echo "$(expr ${VALUE} * ${MAX_SIZE})" >&1
+    return "$?"
+  fi
+
+  # Check if the value specified is as %FREE.
+  VALUE=$(echo "$1" | sed -n "/s/%FREE$//p")
+  if [ "${VALUE}" != "" ]; then
+    echo "$(expr ${VALUE} * ${REMAINING_SIZE})" >&1
+    return "$?"
+  fi
+
+  # The supplied value was not in any of the known formats.
+  return 1
+}
+
+add_size() {
+  # Extract the components of the additions as "${LHS} + ${RHS}".
+  local LHS="$1"
+  local RHS="$2"
+
+  # Convert both sizes to MiB.
+  LHS=$(to_mib ${LHS})
+  RHS=$(to_mib ${RHS})
+
+  # Calculate and return the size of the addition.
+  echo "$(expr ${LHS} + ${RHS})MiB" >&1
+}
+
+calc_part_end() 
+{
+  PART_START=$1
+  PART_SIZE=$2
+  DISK_SIZE=$3
+  DISK_REMAINING=$4
+
+
+
+
+
+}
+
+
+################################################################################
 # Validate the specified file path by checking if the directory and file exists
 # or whether it can be created.
 #

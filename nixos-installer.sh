@@ -27,8 +27,18 @@ VBOX_GUEST="false"
 VMWARE_GUEST="false"
 X11_GUEST="false"
 
+HOME_SIZE="0MiB"
+ROOT_SIZE="0MiB"
+NIX_SIZE="0MiB"
+VAR_SIZE="0MiB"
+SWAP_SIZE="2GiB"
+BOOT_SIZE="1GiB"
+
+
+SCRIPTS_PATH=$(dirname "$0")/scripts
+
 # Include the common helper functions.
-. $(dirname "$0")/hdd_setup/helpers.sh
+. ${SCRIPTS_PATH}/func_lib.sh
 
 # Path to the generators.
 GEN_PATH=$(dirname "$0")/generators
@@ -103,7 +113,7 @@ while [ "$#" -gt 0 ]; do
     --wifi-enable)    WIFI_ENABLE="true"; shift 1;;
     --wifi-ssid=*)    WIFI_SSID="${1#*=}"; shift 1;;
     --wifi-passwd=*)  WIFI_PASSWD="${1#*=}"; shift 1;;
- 
+
     --auto-gc)        AUTO_GC="true"; shift 1;;
     --auto-dedup)     AUTO_DEDUP="true"; shift 1;;
     --auto-update)    AUTO_UPDATE="true"; shift 1;;
@@ -112,49 +122,75 @@ while [ "$#" -gt 0 ]; do
     --vbox)           VBOX_GUEST="true"; shift 1;;
     --vmware)         VMWARE_GUEST="true"; shift 1;;
 
+    --home-size)      HOME_SIZE="${1#*=}"; shift 1;;
+    --root-size)      ROOT_SIZE="${1#*=}"; shift 1;;
+    --nix-size)       NIX_SIZE="${1#*=}"; shift 1;;
+    --var-size)       VAR_SIZE="${1#*=}"; shift 1;;
+    --swap-size)      SWAP_SIZE="${1#*=}" shift 1;;
+    --boot-size)      BOOT_SIZE="${1#*=}" shift 1;;
+
     *) echo "invalid argument: $1" >&2; exit 1;;
   esac
 done
 
-# Makre sure the script is run as root.
+# Make sure the script is run as root.
 must_be_root ${LINENO}
 
 # Check that the script args are valid.
 validate_args
 
-# Prepare the host for installation / reinstallation.
+# Prepare the host for installation / re-installation.
 prepare
 
 # Configure the hard-drive.
-case ${ENCRYPT} in
-  "full")
-    $(dirname "$0")/hdd_setup/encrypt_full.sh ${HDD} ${KEY}
-    check_error "$?" "${FILE_NAME}" "${LINENO}" \
-      "Installation failed."
-    ;;
-  
-  "root")
-    $(dirname "$0")/hdd_setup/encrypt_root.sh ${HDD} ${KEY}
-    check_error "$?" "${FILE_NAME}" "${LINENO}" \
-      "Installation failed."
+case ${HDD_CONF} in
+  "lvm2-full-enc")
+    ERR=$(${SCRIPTS_PATH}/lvm2-full-enc.sh --hdd=${HDD} --key=${KEY} \
+      --home-size=${HOME_SIZE} --root-size=${ROOT_SIZE} --nix-size=${NIX_SIZE} \
+      --var-size=${VAR_SIZE} --swap-size=${SWAP_SIZE} --boot-size=${BOOT_SIZE} \
+      2>&1 >/dev/null)
+    check_error "${LINENO}" "Installation failed because:\n\n${ERR}\n\n"
     ;;
 
-  *)
-    $(dirname "$0")/hdd_setup/encrypt_none.sh ${HDD}
-    check_error "$?" "${FILE_NAME}" "${LINENO}" \
-      "Installation failed."
+  "lvm2-part-enc")
+    ERR=$(${SCRIPTS_PATH}/lvm2-part-enc.sh --hdd=${HDD} --key=${KEY} \
+      --home-size=${HOME_SIZE} --root-size=${ROOT_SIZE} --nix-size=${NIX_SIZE} \
+      --var-size=${VAR_SIZE} --swap-size=${SWAP_SIZE} --boot-size=${BOOT_SIZE} \
+      2>&1 >/dev/null)
+    check_error "${LINENO}" "Installation failed because:\n\n${ERR}\n\n"
+    ;;
+
+  "lvm2-no-enc")
+    ERR=$(${SCRIPTS_PATH}/lvm2-no-enc.sh --hdd=${HDD} 2>&1 >/dev/null)
+      --home-size=${HOME_SIZE} --root-size=${ROOT_SIZE} --nix-size=${NIX_SIZE} \
+      --var-size=${VAR_SIZE} --swap-size=${SWAP_SIZE} --boot-size=${BOOT_SIZE} \
+    check_error "${LINENO}" "Installation failed because:\n\n${ERR}\n\n"
+    ;;
+
+  "zfs-no-enc")
+    ERR=$(${SCRIPTS_PATH}/zfs-no-enc.sh --hdd=${HDD} 2>&1 >/dev/null)
+      --home-size=${HOME_SIZE} --root-size=${ROOT_SIZE} --nix-size=${NIX_SIZE} \
+      --var-size=${VAR_SIZE} --swap-size=${SWAP_SIZE} --boot-size=${BOOT_SIZE} \
+    check_error "${LINENO}" "Installation failed because:\n\n${ERR}\n\n"
+    ;;
+
+  "zfs-enc")
+    ERR=$(${SCRIPTS_PATH}/zfs-enc.sh --hdd=${HDD} --${KEY} 2>&1 >/dev/null)
+      --home-size=${HOME_SIZE} --root-size=${ROOT_SIZE} --nix-size=${NIX_SIZE} \
+      --var-size=${VAR_SIZE} --swap-size=${SWAP_SIZE} --boot-size=${BOOT_SIZE} \
+    check_error "${LINENO}" "Installation failed because:\n\n${ERR}\n\n"
     ;;
 esac
 
 # Generate the hardware configuration without the filesystems section since this
 # is done automatically by the hdd_setup scripts.
 ERR=$(nixos-generate-config --root /mnt --no-filesystems 2>&1)
-check_error "$?" "${FILE_NAME}" ${LINENO} \
-  "Failed to generate NixOS config because:\n\n${ERR}"
+check_error "${LINENO}" "Failed to generate NixOS config because:\n\n${ERR}\n\n"
 
 # Copy the configuration of the system.
-cp -r -f $(dirname "$0")/configuration/* "/mnt/etc/nixos/"
-check_error "$?" "${FILE_NAME}" ${LINENO} "Failed to copy default configuration file."
+ERR=$(cp -r -f $(dirname "$0")/configuration/. "/mnt/etc/nixos/"
+check_error "${LINENO}" \
+  "Failed to copy default configuration file because:\n\n${ERR}\n\n"
 
 mkdir -p /mnt/etc/nixos/host
 mkdir -p /mnt/etc/nixos/security
