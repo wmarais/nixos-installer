@@ -83,16 +83,27 @@ validate_args() {
   IFS="," read -a NI_TEMP_GROUPS <<< "${NI_GROUPS}"
   NI_GROUPS=("${NI_REQ_GROUPS[@]}" "${NI_TEMP_GROUPS[@]}")
 
+  # Validate all the groups.
+  validate_groups "${NI_GROUPS[@]}"
+  check_error "${LINENO}" "Invalid group names: ${NI_GROUPS[@]}"
+
   # Make sure the user name is valid.
   validate_user_or_group_name "${NI_USER_NAME}"
+  check_error "${LINENO}" "Invalid user name: ${NI_USER_NAME}"
 
   # Make sure the password meet the password policy.
-  #validate_password "${NI_PASSWORD}"
+  validate_password "${NI_PASSWORD}"
+  check_error "${LINENO}" "Invalid password."
 
   # Check that the output file can be generated.
-  #validate_file_path "${NI_OUTPUT}"
+  validate_file_path "${NI_OUTPUT}"
+  check_error "${LINENO}" "Invalid output path: ${NI_OUTPUT}."
 }
 
+################################################################################
+# Print all the groups in the groups list to stdout. This is used to build the
+# extraGroups string for the user account.
+################################################################################
 print_groups() {
   for g in "${NI_GROUPS[@]}"
   do

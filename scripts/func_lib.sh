@@ -159,18 +159,17 @@ wait_or_die()
 
 ################################################################################
 # Check that the user name is valid by check if it matches POSIX user name
-# regex and is less <= 32 characters in size.
-# https://linuxconfig.org/advanced-bash-regex-with-examples
+# regex and length such that: 1 >= length <= 32 characters.
 ################################################################################
 validate_user_or_group_name() {
   # The user or group name to check.
   local NAME="$1"
 
-  # Check if the name matches the Posix NAME_REGEX.
-  local TEMP_NAME=$(echo "${NAME}" | sed -r "s|^[a-z][-a-z0-9]*$||")
-  local NAME_LEN=${#TEMP_NAME}
+  if [[ "${NAME}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]; then
+    return 0
+  fi
 
-  [ ${NAME_LEN} -gt 0 ] && [ ${NAME_LEN} -le 32 ]
+  return 1
 }
 
 ################################################################################
@@ -202,10 +201,10 @@ validate_password () {
 validate_groups() {
   # The groups to check.
   shift
-  local GROUPS=("$@")
+  local NI_GROUPS=("$@")
 
   # Validate each group name.
-  for NAME in "${GROUPS[@]}"; do
+  for NAME in "${NI_GROUPS[@]}"; do
     validate_user_or_group_name "${NAME}"
     if [ "$?" != "0" ]; then
       return 1
@@ -298,6 +297,10 @@ validate_file_path() {
 
   # Extract the directory portion only.
   local DIRECTORY=$(dirname "${FILE_PATH}")
+
+  if [ "${FILE_PATH}" == "" ]; then
+    return 1;
+  fi
 
   # Check if the directory exist.
   if [ ! -d "${DIRECTORY}" ]; then

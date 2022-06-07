@@ -8,6 +8,19 @@ Limitations:
 * **EFI:** Only support EFI.
 * **GPT:** Only run on GPT partition table.
 
+Requirements:
+* **User Name:** 
+  * All Lowercase
+  * Must start with a letter between: `[a-z]`
+  * Followed by letter or numbers, `[a-z]` and `[0-9]`
+  * Length such that `1 <= length <= 32`
+* **Password:**
+  * Upper-case character
+  * Lower-case character
+  * Number
+  * Special character
+  * Non allowed: ` < > " ~ ' ;`
+  
 ## HOWTO - General Installation
 For installation, networking is required. Only four steps are required:
 
