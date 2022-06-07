@@ -1,30 +1,35 @@
 #!/bin/sh
 
 # The user account that will be created.
-USER=""
+NI_USER_NAME=""
 
 # The full name of the user that will appear on the account descriptioni.
-FULL_NAME=""
+NI_FULL_NAME=""
 
 # The user password that will be set.
-PASSWORD=""
+NI_PASSWORD=""
 
 # The configuration file that will be generated.
-OUTPUT=""
+NI_OUTPUT=""
 
 # The list of groups that the initial user belongs too. It is important to note
 # that this user is always in the wheel (admin) group otherwise there will be
 # no account with administrative privileges on the host.
-REQ_GROUPS=("wheel")
+NI_REQ_GROUPS=("wheel" "networkmanager" "libvirtd" "audio" "video")
 
 # The combined list of groups.
-GROUPS=()
+NI_GROUPS=()
+
+SCRIPTS_PATH=$(dirname "$0")/../scripts
+
+# Include the common helper functions.
+. ${SCRIPTS_PATH}/func_lib.sh
 
 ################################################################################
 # The help message that will be displayed when the user type --help as an
 # argument to the script.
 ################################################################################
-STR_HELP="\
+NI_STR_HELP="\
 NAME:
 
   gen_users - a script to disable the root account and create the first 
@@ -32,20 +37,20 @@ NAME:
 
 USAGE:
 
-  gen_users \
-    --user=<user name> \
-    --full_name=<full name> \
-    --groups=<groups> \
-    --password=<user password> \
+  ./gen_users.sh \\
+    --user-name=<user name> \\
+    --full-name=<full name> \\
+    --groups=<groups> \\
+    --password=<user password> \\
     --output=<output path>
 
 OPTIONS:
 
-  --user        The user name that will be registered in the system and used
+  --user-name   The user name that will be registered in the system and used
                 to log into the system. For example, for some user \"Bob Jones\"
                 , a good username would be \"bjones\".
 
-  --full_name   The full name of the user, i.e. \"Bob Jones\". This will be
+  --full-name   The full name of the user, i.e. \"Bob Jones\". This will be
                 displayed on the longin screen etc.
 
   --password    The initial password that will be set. The user will be required
@@ -64,53 +69,57 @@ OPTIONS:
 # Print the help information for the script.
 ################################################################################
 print_help() {
-  echo "${STR_HELP}"
+  echo "${NI_STR_HELP}"
 
   # Return an error code so that any other script that uses this script will
   # accidentally call --help and thing that the script actually executed.
   exit 1;
 }
 
-
-
-
 ################################################################################
 # Check that suitable arguments has been supplied to the script.
 ################################################################################
 validate_args() {
-  IFS="," read -a TEMP_GROUPS <<< "${GROUPS_IN}"
-  GROUPS=("${REQ_GROUPS[@]}" "${TEMP_GROUPS[@]}")
+  IFS="," read -a NI_TEMP_GROUPS <<< "${NI_GROUPS}"
+  NI_GROUPS=("${NI_REQ_GROUPS[@]}" "${NI_TEMP_GROUPS[@]}")
 
   # Make sure the user name is valid.
-  validate_user "${USER}"
+  validate_user_or_group_name "${NI_USER_NAME}"
 
   # Make sure the password meet the password policy.
-  validate_password "${PASSWORD}"
+  #validate_password "${NI_PASSWORD}"
 
   # Check that the output file can be generated.
-  validate_file_path "${OUTPUT}"
+  #validate_file_path "${NI_OUTPUT}"
 }
 
+print_groups() {
+  for g in "${NI_GROUPS[@]}"
+  do
+    printf "\"$g\" "
+  done
+}
 
 ################################################################################
 # Parse the arguments to the script.
-
-
-
+################################################################################
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --user=*)         USER="${1#*=}"; shift 1;;
-    --full_name=*)    FULL_NAME="${1#*=}"; shift 1;;
-    --password=*)     PASSWORD="${1#*=}"; shift 1;;
-    --output=*)       OUTPUT="${1#*=}"; shift 1;;
-    --groups=*)       GROUPS="${1#*=}"; shift 1;;
-    --help)           print_help; exit 1;
-    *)                echo "invalid argument: $1" >&2; print_help; exit 1;;
+    --user-name=*)    NI_USER_NAME="${1#*=}"; shift 1;;
+    --full-name=*)    NI_FULL_NAME="${1#*=}"; shift 1;;
+    --password=*)     NI_PASSWORD="${1#*=}"; shift 1;;
+    --output=*)       NI_OUTPUT="${1#*=}"; shift 1;;
+    --groups=*)       NI_GROUPS="${1#*=}"; shift 1;;
+    --help)           print_help; exit 1;;
+    *)                echo "Invalid argument: $1" >&2; print_help; exit 1;;
   esac
 done
 
+# Make sure the arguments are valid.
+validate_args
+
 # The template string that will be used to generate the configuration.
-STR_USERS="\
+NI_STR_USERS="\
 { config, pkgs, ... }:
 {
   users = {
@@ -122,19 +131,14 @@ STR_USERS="\
       };
 
       # Create a the default user with sudo access.
-      ${USER} = {
+      ${NI_USER_NAME} = {
+        description = \"${NI_FULL_NAME}\";
         isNormalUser = true;
-        extraGroups = [ 
-          \"wheel\" 
-
-          \"networkmanager\" 
-          \"libvirtd\" 
-          \"audio\" \"${VBOXSF_GROUP}\" ];
-        initialHashedPassword = \"$(mkpasswd -m sha-512 ${PASSWORD})\";
+        extraGroups = [ $(print_groups)];
+        initialHashedPassword = \"$(mkpasswd -m sha-512 ${NI_PASSWORD})\";
       };
     };
   };
 }"
 
-echo "${STR_USERS}" > ${CONF_FILE}
-
+echo "${NI_STR_USERS}" > ${NI_OUTPUT}

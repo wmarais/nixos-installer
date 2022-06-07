@@ -19,6 +19,7 @@
     ../configuration/applications/bash.nix
   ];
 
+  # Basic tools required for installation.
   environment.systemPackages = with pkgs; [
     parted
     lvm2
@@ -26,7 +27,9 @@
     openssh
     zfs
     git
+    lshw
   ];
 
+  # Password is needed to enable SSH.
   users.users.nixos.initialPassword = "nixos";
 }

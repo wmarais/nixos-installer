@@ -11,6 +11,9 @@ TYPE=""
 # The timezone of the host.
 TIME_ZONE="Australia/Adelaide"
 
+# Indicates whether Auto Garbage Collection should be enabled or not. It is not
+# critical to have enabled, but it is is nice to keep the used space to a
+# minimum by deleting unused packages.
 AUTO_GC="false"
 AUTO_DEDUP="false"
 AUTO_UPDATE="false"
@@ -126,8 +129,8 @@ while [ "$#" -gt 0 ]; do
     --root-size)      ROOT_SIZE="${1#*=}"; shift 1;;
     --nix-size)       NIX_SIZE="${1#*=}"; shift 1;;
     --var-size)       VAR_SIZE="${1#*=}"; shift 1;;
-    --swap-size)      SWAP_SIZE="${1#*=}" shift 1;;
-    --boot-size)      BOOT_SIZE="${1#*=}" shift 1;;
+    --swap-size)      SWAP_SIZE="${1#*=}"; shift 1;;
+    --boot-size)      BOOT_SIZE="${1#*=}"; shift 1;;
 
     *) echo "invalid argument: $1" >&2; exit 1;;
   esac

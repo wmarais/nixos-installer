@@ -37,7 +37,7 @@ device_exists()
 ################################################################################
 # Print a fatal error message.
 ################################################################################
-fatal_error() 
+fatal_error()
 {
   # The line on which the check was performed.
   local LINE_NUM="$1"
@@ -55,7 +55,7 @@ fatal_error()
 ################################################################################
 # Check if the previous call generated an error.
 ################################################################################
-check_error() 
+check_error()
 {
   # The return code of the preceeding call. Must be saved before doing anything
   # else that will overwrite it.
@@ -71,8 +71,8 @@ check_error()
   if [ "${RET_CODE}" != "0" ]; then
     fatal_error "${LINE_NUM}" "${MESSAGE}"
   fi
- 
-  # No error occurred. 
+
+  # No error occurred.
   return 0
 }
 
@@ -129,7 +129,7 @@ wait_or_die()
 
   # The current number of retries.
   local TRY_COUNT=0
-  
+
   # Keep waiting for the file to become available until the timeout period
   # expires.
   while [ ! -e "${DEVICE}" ]; do
@@ -160,16 +160,17 @@ wait_or_die()
 ################################################################################
 # Check that the user name is valid by check if it matches POSIX user name
 # regex and is less <= 32 characters in size.
+# https://linuxconfig.org/advanced-bash-regex-with-examples
 ################################################################################
 validate_user_or_group_name() {
   # The user or group name to check.
   local NAME="$1"
 
   # Check if the name matches the Posix NAME_REGEX.
-  local TEMP_USER=$(echo "${USER}" | sed -rn '^[a-z][-a-z0-9]*$')
-  local USER_LEN=${#TEMP_USER}
+  local TEMP_NAME=$(echo "${NAME}" | sed -r "s|^[a-z][-a-z0-9]*$||")
+  local NAME_LEN=${#TEMP_NAME}
 
-  [ ${USER_LEN} -gt 0 ] && [ ${USER_LEN} -le 32 ]
+  [ ${NAME_LEN} -gt 0 ] && [ ${NAME_LEN} -le 32 ]
 }
 
 ################################################################################
@@ -209,7 +210,7 @@ validate_groups() {
     if [ "$?" != "0" ]; then
       return 1
     fi
-  done 
+  done
 
   # All group names passed.
   return 0
@@ -236,12 +237,12 @@ to_mib() {
 
   # Check if the value is specified in GiB.
   VALUE=$(echo "$1" | sed -n "/s/GiB$//p")
-  
-  if [ "${VALUE}" != "" ]; then 
+
+  if [ "${VALUE}" != "" ]; then
     echo "$(expr ${VALUE} * 1024)" >&1
     return "$?"
   fi
-  
+
   # Check if the value specified in %.
   VALUE=$(echo "$1" | sed -n "/s/%$//p")
   if [ "${VALUE}" != "" ]; then
@@ -273,17 +274,12 @@ add_size() {
   echo "$(expr ${LHS} + ${RHS})MiB" >&1
 }
 
-calc_part_end() 
+calc_part_end()
 {
   PART_START=$1
   PART_SIZE=$2
   DISK_SIZE=$3
   DISK_REMAINING=$4
-
-
-
-
-
 }
 
 

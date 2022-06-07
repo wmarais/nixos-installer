@@ -7,5 +7,6 @@
     curl
     git
     qemu_kvm
+    lshw
   ];
 }
