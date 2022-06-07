@@ -135,12 +135,17 @@ wait_or_die "${LINENO}" "/dev/disk/by-partlabel/${NAME}" 5
 # Check what should be done with the partition.
 case "${TYPE}" in
   "efi")
+    ERR_MSG=$(parted -s ${DEVICE} set "/dev/disk/by-partlabel/${NAME}" \
+      "esp" "on" 2>&1 > /dev/null)
+
+    check_error "${LINENO}" "Failed to set ESP flag on EFI partition."
+
     print_info "${LINENO}" "Creating FAT32 filesystem for ${NAME}....."
 
     ERR_MSG=$(mkfs.vfat -F 32 "/dev/disk/by-partlabel/${NAME}" 2>&1 >/dev/null)
 
     check_error "${LINENO}" \
-      "Failed to create fat32 file system because:\n\n${ERR_MSG}\n\n"
+      "Failed to create fat32 file system because:\n\n${ERR_MSG}\n\n"      
     ;;
   "crypt")
     print_info "${LINENO}" "Encrypting ${NAME}....."

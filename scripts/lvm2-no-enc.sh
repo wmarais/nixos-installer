@@ -45,11 +45,20 @@ ROOT_SIZE=""
 NIX_SIZE=""
 
 
-# Calculate the boundary of the EFI Partition.
-EFI_START="1MiB"
-EFI_END=$(expr $(to_mib ${EFI_START}) + $(to_mib ${EFI_SIZE}))
+# Calculate the boundary of the boot partition.
+NI_BOOT_START="1"
+NI_BOOT_END=$(expr $(to_mib ${NI_BOOT_START}) + $(to_mib ${NI_BOOT_SIZE}))
 
-# Calculate the boundary of the BOOT partition.
+# Calculate the PV boundary.
+NI_PV_STARTT=$(expr ${NI_BOOT_END} + 1)
+
+
+
+
+
+
+
+
 
 
 
