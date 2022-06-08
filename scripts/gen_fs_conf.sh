@@ -18,18 +18,13 @@ ENC_NONE_FS_CONF="{ config, pkgs, ... }:
   imports = [ ];
 
   # Enable EFI Boot.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = \"/boot/efi\";
-  };
-
-  # Configure grub to boot the encrypted partition.
-  boot.loader.grub = {
-    enable = true;
-    version = 2;
-    device = \"nodev\";
-    efiSupport = true;
+  boot.loader = {
+    grub.enable = false;
+    systemd-boot.enable = true;
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = \"/boot\";
+    };
   };
 
   fileSystems.\"/\" = { 
@@ -55,18 +50,13 @@ ENC_ROOT_FS_CONF="{ config, pkgs, ... }:
   imports = [ ];
 
   # Enable EFI Boot.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi = {
-    canTouchEfiVariables = true;
-    efiSysMountPoint = \"/boot/efi\";
-  };
-
-  # Configure grub to boot the encrypted partition.
-  boot.loader.grub = {
-    enable = true;
-    version = 2;
-    device = \"nodev\";
-    efiSupport = true;
+  boot.loader = {
+    grub.enable = false;
+    systemd-boot.enable = true;
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = \"/boot\";
+    };
   };
 
   # Configure luks so that disk must be decrypted then start LVM.

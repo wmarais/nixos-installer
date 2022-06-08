@@ -8,8 +8,6 @@
 #
 # The image is stored in "results/iso".
 ################################################################################
-
-
 {config, pkgs, ...}:
 {
   imports = [
@@ -32,4 +30,7 @@
 
   # Password is needed to enable SSH.
   users.users.nixos.initialPassword = "nixos";
+
+  # The nixos version.
+  system.stateVersion = "22.05";
 }

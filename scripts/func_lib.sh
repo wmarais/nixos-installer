@@ -113,6 +113,15 @@ print_info()
   return 0
 }
 
+disk_exists()
+{
+  local DISK="$1"
+  if [ -e "${DISK}" ]; then
+    return 0
+  fi
+  return 1
+}
+
 ################################################################################
 # Wait for the specified file to become available or time out / exit.
 ################################################################################
@@ -220,39 +229,58 @@ validate_groups() {
 # suffix so that the output value can be used in an expr.
 ################################################################################
 to_mib() {
-  # The maximum size of the volume.
-  local MAX_SIZE=$(to_mib "$2" "0" "0")
-
-  # The remaining size of the volume (empty space).
-  local REMAINING_SIZE=$(to_mib "$3" "0" "0")
+  # Strip leading and trailing white spaces.
+  NI_STR_IN=$(echo $1 | sed -e "s|^[[:space:]]*||" -e "s|[[:space:]]*$||")
 
   # Check if the value is specified in MiB
-  local VALUE=$(echo "$1" | sed -n "/s/MiB$//p")
-
+  local VALUE=$(echo "${NI_STR_IN}" | sed -n "s|MiB$||p")
+  
   if [ "${VALUE}" != "" ]; then
     echo "${VALUE}" >&1
     return "$?"
   fi
 
+    # Check if the value is specified in MiB
+  local VALUE=$(echo "${NI_STR_IN}" | sed -n "s|MB$||p")
+  
+  if [ "${VALUE}" != "" ]; then
+    echo echo "$(expr ${VALUE} \* 1000 / 1024)" >&1
+    return "$?"
+  fi
+
   # Check if the value is specified in GiB.
-  VALUE=$(echo "$1" | sed -n "/s/GiB$//p")
+  VALUE=$(echo "${NI_STR_IN}" | sed -n "s|GiB$||p")
 
   if [ "${VALUE}" != "" ]; then
-    echo "$(expr ${VALUE} * 1024)" >&1
+    echo "$(expr ${VALUE} \* 1024)" >&1
+    return "$?"
+  fi
+
+  # Check if the value is specified in GB.
+  VALUE=$(echo "${NI_STR_IN}" | sed -n "s|GB$||p")
+
+  if [ "${VALUE}" != "" ]; then
+    echo "$(expr ${VALUE} \* 1000)" >&1
     return "$?"
   fi
 
   # Check if the value specified in %.
-  VALUE=$(echo "$1" | sed -n "/s/%$//p")
+  VALUE=$(echo "${NI_STR_IN}" | sed -n "s|%$||p")
   if [ "${VALUE}" != "" ]; then
-    echo "$(expr ${VALUE} * ${MAX_SIZE})" >&1
+    # The maximum size of the volume.
+    local MAX_SIZE=$(to_mib "$2" "0" "0")
+
+    echo "$(expr ${VALUE} / 100 \* ${MAX_SIZE})" >&1
     return "$?"
   fi
 
   # Check if the value specified is as %FREE.
-  VALUE=$(echo "$1" | sed -n "/s/%FREE$//p")
+  VALUE=$(echo "${NI_STR_IN}" | sed -n "s|%FREE$||p")
   if [ "${VALUE}" != "" ]; then
-    echo "$(expr ${VALUE} * ${REMAINING_SIZE})" >&1
+    # The remaining size of the volume (empty space).
+    local REMAINING_SIZE=$(to_mib "$3" "0" "0")
+
+    echo "$(expr ${VALUE} / 100 \* ${REMAINING_SIZE})" >&1
     return "$?"
   fi
 
@@ -264,21 +292,92 @@ add_size() {
   # Extract the components of the additions as "${LHS} + ${RHS}".
   local LHS="$1"
   local RHS="$2"
+  local MAXIMUM_SIZE="$3"
+  local REMAINING_SIZE="$4"
 
   # Convert both sizes to MiB.
-  LHS=$(to_mib ${LHS})
-  RHS=$(to_mib ${RHS})
+  LHS=$(to_mib ${LHS} ${MAXIMUM_SIZE} ${REMAINING_SIZE})
+  RHS=$(to_mib ${RHS} ${MAXIMUM_SIZE} ${REMAINING_SIZE})
 
   # Calculate and return the size of the addition.
   echo "$(expr ${LHS} + ${RHS})MiB" >&1
 }
 
+subtract_size() {
+  # Extract the components of the subtraction as "${LHS} - ${RHS}".
+  local LHS="$1"
+  local RHS="$2"
+  local MAXIMUM_SIZE="$3"
+  local REMAINING_SIZE="$4"
+
+  # Convert both sizes to MiB.
+  LHS=$(to_mib ${LHS} ${MAXIMUM_SIZE} ${REMAINING_SIZE})
+  RHS=$(to_mib ${RHS} ${MAXIMUM_SIZE} ${REMAINING_SIZE})
+
+  # Calculate and return the size of the addition.
+  echo "$(expr ${LHS} - ${RHS})MiB" >&1
+}
+
+################################################################################
+# Calculate the end of the partition in MiB. This is used for when the user
+# specify a size in %.
+################################################################################
 calc_part_end()
 {
-  PART_START=$1
-  PART_SIZE=$2
   DISK_SIZE=$3
   DISK_REMAINING=$4
+
+  PART_START=$(to_mib $1 ${DISK_SIZE} ${DISK_REMAINING})
+  PART_SIZE=$(to_mib $2 ${DISK_SIZE} ${DISK_REMAINING})
+
+  echo "$(expr ${PART_START} + ${PART_SIZE})MiB"
+}
+
+calc_remaining() 
+{
+  local NI_DISK_SIZE="$1"
+  local NI_PART_END="$2"
+
+
+
+
+}
+
+################################################################################
+# Determine the true start of the partition.
+################################################################################
+part_start() {
+  local PARTITION="$1"
+  local PART_START=$(parted ${PARTITION} print | sed -n "s|^ *[0-9]||p" \
+    | awk '{print $1}')
+  
+  echo "$(to_mib ${PART_START})MiB"
+}
+
+################################################################################
+# Determine the true end of the partition.
+################################################################################
+part_end() {
+  local PARTITION="$1"
+  local PART_END=$(parted ${PARTITION} print | sed -n "s|^ *[0-9]||p" \
+    | awk '{print $2}')
+
+  echo "$(to_mib ${PART_END})MiB"
+}
+
+################################################################################
+# Calculate the size of the Disk in MiB.
+################################################################################
+size_of_disk() {
+  local DISK=$1
+
+  local SIZE=$(parted ${DISK} print | sed -n "s|Disk ${DISK}: ||p")
+  if [ "$?" != "0" ]; then
+    return 1
+  fi
+
+  echo "$(to_mib ${SIZE})MiB"
+  return $?
 }
 
 
